@@ -1,0 +1,90 @@
+using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJQ.Plain;
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices.JavaScript;
+using System.Threading.Tasks;
+using Wasm;
+
+internal class Program
+{
+    private static async global::System.Threading.Tasks.Task Main(string[] args)
+    {
+        Console.WriteLine("Hello, Browser!");
+
+
+        //await SerratedSharp.SerratedJQ.SerratedJQModule.ImportAsync("..");
+        //await SerratedSharp.SerratedJQ.SerratedJQModule.LoadJQuery("https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js");
+
+        //await JSInteropHelpersModule.ImportAsync("", "./SerratedInteropHelpers.js");
+        
+        // TODO: This depends on the .Blazor project because it is the RCL packaging the JS dependency.  We probably need to make the non-RCL root .SerratedJSInterop project a RCL project with the file.
+        await JSInteropHelpersModule.ImportAsync();
+        
+        // Legacy InteropHelpers, needed to support SerratedJQ which still uses old.
+        await SerratedSharp.SerratedJQ.SerratedJQModule.ImportAsync("..");
+        await SerratedSharp.SerratedJQ.SerratedJQModule.LoadJQuery("https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js");
+        
+
+        await JQueryPlain.Ready();
+        Console.WriteLine("JQuery Document Ready!");
+
+        // Do something with JQuery
+        JQueryPlain.Select("#out").Append("<b>Appended</b>");
+
+        await TestOrchestrator.Begin();
+
+        // Read the HTML of Body
+        //string testResultsBody = JQueryPlain.Select("body").Html();
+        // Send testResultsBody to Cursor Debug endpoint
+
+        if (args.Length == 1 && args[0] == "start")
+            StopwatchSample.Start();
+
+        while (true)
+        {
+            StopwatchSample.Render();
+            await Task.Delay(1000);
+        }
+    }
+}
+
+partial class StopwatchSample
+{
+    private static Stopwatch stopwatch = new();
+
+    public static void Start() => stopwatch.Start();
+    public static void Render() => SetInnerText("#time", stopwatch.Elapsed.ToString(@"mm\:ss"));
+
+    [JSImport("dom.setInnerText", "main.js")]
+    internal static partial void SetInnerText(string selector, string content);
+
+    [JSExport]
+    internal static bool Toggle()
+    {
+        if (stopwatch.IsRunning)
+        {
+            stopwatch.Stop();
+            return false;
+        }
+        else
+        {
+            stopwatch.Start();
+            return true;
+        }
+    }
+
+    [JSExport]
+    internal static void Reset()
+    {
+        if (stopwatch.IsRunning)
+            stopwatch.Restart();
+        else
+            stopwatch.Reset();
+
+        Render();
+    }
+
+    [JSExport]
+    internal static bool IsRunning() => stopwatch.IsRunning;
+}
