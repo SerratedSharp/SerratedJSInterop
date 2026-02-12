@@ -384,6 +384,9 @@ MSBuild_Logs/
 # Visual Studio History (VSHistory) files
 .vshistory/
 
+# SerratedJSInterop generated source (from Internal project build)
+SerratedSharp.SerratedJSInterop/Generated/
+
 # BeatPulse healthcheck temp database
 healthchecksdb
 
