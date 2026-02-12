@@ -9,7 +9,7 @@ namespace SerratedSharp.SerratedJSInterop
             static Lazy<JSObject> _console = new(() => JSHost.GlobalThis.GetPropertyAsJSObject("console"));
 
             /// <summary>
-            /// console.log, but note all params gets logged as a single array
+            /// Calls console.log with the provided parameters as separate arguments.
             /// </summary>
             /// <param name="parameters">JSObjects or strings to log.</param>
             public static void Log(params object[] parameters)
