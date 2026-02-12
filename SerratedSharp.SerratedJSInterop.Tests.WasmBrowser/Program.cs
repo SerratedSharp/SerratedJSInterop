@@ -34,9 +34,8 @@ internal class Program
 
         await TestOrchestrator.Begin();
 
-        // Read the HTML of Body
+        // Read the HTML of Body for test verification
         //string testResultsBody = JQueryPlain.Select("body").Html();
-        // Send testResultsBody to Cursor Debug endpoint
 
         if (args.Length == 1 && args[0] == "start")
             StopwatchSample.Start();
