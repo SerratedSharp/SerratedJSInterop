@@ -27,7 +27,7 @@ public static class ParamsHelpers
     public static A[] PrependToArray<A>(A arg, ref A[] args) //where A : class
     {
         if (args == null) {
-            args = new A[0];// start with emptry array if was null
+            args = new A[0];// start with empty array if was null
         }        
         Array.Resize(ref args, args.Length + 1);// make room for new item
         Array.Copy(args, 0, args, 1, args.Length - 1);// shift elements to the right to make room or new item

@@ -122,7 +122,7 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
         sb.AppendLine("    public static class AgnosticRuntime");
         sb.AppendLine("    {");
         sb.AppendLine("        /// <summary>");
-        sb.AppendLine("        /// Gets a value indicating whether being used from Uno.Wasm.Bootstrap rather than .NET8 wasmbrowser.");
+        sb.AppendLine("        /// Gets a value indicating whether being used from Uno.Wasm.Bootstrap rather than .NET WasmBrowser.");
         sb.AppendLine("        /// </summary>");
         sb.AppendLine("        internal static bool IsUnoWasmBootstrapLoaded => isUnoWasmBootstrapLoaded.Value;");
         sb.AppendLine("        private static Lazy<bool> isUnoWasmBootstrapLoaded = new Lazy<bool>(() =>");
