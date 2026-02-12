@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SerratedSharp.SerratedJSInterop.Internal</RootNamespace>
+    <AssemblyName>SerratedSharp.SerratedJSInterop.Internal</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <!-- Pass generated output directory to the source generator via AdditionalFiles (path is used, file need not exist) -->
+  <ItemGroup>
+    <AdditionalFiles Include="$(ProjectDir)..\SerratedJSInterop\Generated\.generated" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SerratedJSInterop.SourceGenerator\SerratedJSInterop.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>
