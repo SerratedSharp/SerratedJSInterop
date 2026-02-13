@@ -309,8 +309,6 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
                 parameterListForImport = string.Join(", ", member.Parameters.Select(p => FormatInstanceHelperParameter(p)));
             if (returnMarshalAttribute is null)
                 returnMarshalAttribute = InferReturnMarshal(member.ReturnType);
-            if (parameterListForImport is null)
-                parameterListForImport = parameters;
             if (returnMarshalAttribute is null && needsJSMarshal)
                 returnMarshalAttribute = "[return: JSMarshalAs<JSType.Array<JSType.Object>>]";
 

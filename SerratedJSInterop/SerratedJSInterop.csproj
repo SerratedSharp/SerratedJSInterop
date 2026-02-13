@@ -1,13 +1,36 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>SerratedSharp.SerratedJSInterop</RootNamespace>
+    <PackageId>SerratedSharp.SerratedJSInterop</PackageId>
+    <Authors>SerratedSharpSolutions</Authors>
+    <Company>SerratedSharpSolutions</Company>
+    <Description>
+		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using
+		the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop.
+		Simplifies interop by reducing amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
+	</Description>
+    <Copyright>Copyright (c) SerratedSharpSolutions 2026</Copyright>
+    <PackageTags>WebAssembly; Blazor; JSInterop; JSImport; WasmBrowser</PackageTags>
+            <Version>0.3.0</Version>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+        <FileVersion>0.3.0.0</FileVersion>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
     <AssemblyName>SerratedSharp.SerratedJSInterop</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageLicenseFile />
+    <PackageProjectUrl>https://github.com/SerratedSharp/SerratedJSInterop</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SerratedSharp/SerratedJSInterop/tree/main/SerratedJSInterop</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="readme.md" />
+  </ItemGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -16,6 +39,27 @@
   <ItemGroup>
     <ProjectReference Include="..\SerratedJSInterop.Internal\SerratedJSInterop.Internal.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <ShimSourcePath>$(ProjectDir)wwwroot\SerratedJSInteropShim.js</ShimSourcePath>
+    <ShimWasmScriptsPath>$(ProjectDir)WasmScripts\SerratedJSInteropShim.js</ShimWasmScriptsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="WasmScripts\SerratedJSInteropShim.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="WasmScripts\SerratedJSInteropShim.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="CopyAndTransformShimToWasmScripts" BeforeTargets="BeforeBuild" Condition="Exists('$(ShimSourcePath)')">
+    <MakeDir Directories="$(ProjectDir)WasmScripts" />
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)CopyAndTransformShim.ps1&quot; -SourcePath &quot;$(ShimSourcePath)&quot; -DestPath &quot;$(ShimWasmScriptsPath)&quot;" />
+  </Target>
 
   <ItemGroup>
     <Folder Include="Generated\" />
