@@ -1,3 +1,5 @@
+For internal use only.
+
 # SerratedSharp.SerratedJSInterop.Internal
 
 This project holds the source for JS interop helpers, from which .NET and Uno flavors of JSImport declarations are generated.
