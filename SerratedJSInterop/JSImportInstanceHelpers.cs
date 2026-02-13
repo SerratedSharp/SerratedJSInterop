@@ -8,7 +8,7 @@ using System.Runtime.InteropServices.JavaScript;
 
 public static class JSImportInstanceHelpers
 {
-    // J should be a JSObject or other prmitiive JS type
+    // J should be a JSObject or other primitive JS type
     public static J GetPropertyOfSameName<J>(JSObject jsObject, Breaker _ = default(Breaker), [CallerMemberName] string? propertyName = null)
     {
         return GetProperty<J>(jsObject, propertyName!);
@@ -43,7 +43,7 @@ public static class JSImportInstanceHelpers
         return W.WrapInstance(jsObjectRtn);
     }
 
-    // J should be a JSObject or other prmitiive JS type
+    // J should be a JSObject or other primitive JS type
     public static J CallJSOfSameName<J>(JSObject jsObject, object[] parameters, Breaker _ = default(Breaker), [CallerMemberName] string? funcName = null)
     {
         return CallJSFunc<J>(jsObject, funcName!, parameters);

@@ -1,4 +1,6 @@
-// This javascript is provided as a Static Web Asset by SerratedSharp.SerratedJSInterop.Blazor for Blazor WASM.
+define(() => {
+
+// This javascript is provided as a Static Web Asset by SerratedSharp.SerratedJSInterop for Blazor WASM or WasmBrowser.
 console.log("Declaring SerratedJSInteropShim Shims with export");
 
 var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
@@ -40,4 +42,4 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
 
 })(SerratedJSInteropShim = globalThis.SerratedJSInteropShim || (globalThis.SerratedJSInteropShim = {}));
 
-export { SerratedJSInteropShim };
+});

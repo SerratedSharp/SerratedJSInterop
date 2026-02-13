@@ -8,9 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SerratedJSInterop\SerratedJSInterop.csproj" />
     <ProjectReference Include="..\SerratedDom\SerratedDom.csproj" />
-	<ProjectReference Include="..\SerratedJSInterop.Tests.Shared\SerratedJSInterop.Tests.Shared.csproj" />
-	  <!-- Reference Blazor project to pull in SerratedInteropHelpers.js, TODO: Decide if we need a seperate non-Blazor project, but not RCL is a recommended way to package JS for WasmBrowser  -->
-	  <ProjectReference Include="..\SerratedJSInterop.Blazor\SerratedJSInterop.Blazor.csproj" />
+    <ProjectReference Include="..\SerratedJSInterop.Tests.Shared\SerratedJSInterop.Tests.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!--Included transitively by SerratedJQ: <PackageReference Include="SerratedSharp.JSInteropHelpers" Version="0.1.7" />-->

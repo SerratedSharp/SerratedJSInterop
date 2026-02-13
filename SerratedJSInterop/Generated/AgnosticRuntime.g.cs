@@ -6,7 +6,7 @@ namespace SerratedSharp.SerratedJSInterop
     public static class AgnosticRuntime
     {
         /// <summary>
-        /// Gets a value indicating whether being used from Uno.Wasm.Bootstrap rather than .NET8 wasmbrowser.
+        /// Gets a value indicating whether being used from Uno.Wasm.Bootstrap rather than .NET WasmBrowser.
         /// </summary>
         internal static bool IsUnoWasmBootstrapLoaded => isUnoWasmBootstrapLoaded.Value;
         private static Lazy<bool> isUnoWasmBootstrapLoaded = new Lazy<bool>(() =>
