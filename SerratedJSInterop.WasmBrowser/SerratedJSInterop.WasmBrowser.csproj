@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="readme.md" Pack="true" PackagePath="\" />
+	  <None Include="..\README.md" Pack="true" PackagePath="\" Link="readme.md" />
   </ItemGroup>
 
   <ItemGroup>
