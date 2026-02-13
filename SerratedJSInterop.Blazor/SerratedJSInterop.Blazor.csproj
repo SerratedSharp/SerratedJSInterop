@@ -12,7 +12,7 @@
 		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using
 		the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop.
 		Simplifies interop by reducing amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
-		Companion package for SerratedSharp.SerratedJSInterop, providing compatibility with Stanadalone Brazor WebAssmebly(WASM) projects.
+		Companion package for SerratedSharp.SerratedJSInterop, providing compatibility with Stanadalone Blazor WebAssmebly(WASM) projects.
 	</Description>
     <Copyright>Copyright (c) SerratedSharpSolutions 2026</Copyright>
     <PackageTags>WebAssembly; Blazor; JSInterop; JSImport; RCL</PackageTags>
