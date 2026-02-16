@@ -9,16 +9,14 @@
     <Authors>SerratedSharpSolutions</Authors>
     <Company>SerratedSharpSolutions</Company>
     <Description>
-		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using
-		the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop.
-		Simplifies interop by reducing amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
-		Companion package for SerratedSharp.SerratedJSInterop, providing compatibility with Stanadalone Blazor WebAssmebly(WASM) projects.
+		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop. Simplifies interop by reducing amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
+Companion package for SerratedSharp.SerratedJSInterop, providing compatibility with Standalone Blazor WebAssmebly(WASM) projects.
 	</Description>
     <Copyright>Copyright (c) SerratedSharpSolutions 2026</Copyright>
     <PackageTags>WebAssembly; Blazor; JSInterop; JSImport; RCL</PackageTags>
-            <Version>0.3.0</Version>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
-        <FileVersion>0.3.0.0</FileVersion>
+            <Version>0.3.1</Version>
+    <AssemblyVersion>0.3.1.0</AssemblyVersion>
+        <FileVersion>0.3.1.0</FileVersion>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <AssemblyName>SerratedSharp.SerratedJSInterop.Blazor</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -26,6 +24,7 @@
     <PackageProjectUrl>https://github.com/SerratedSharp/SerratedJSInterop</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SerratedSharp/SerratedJSInterop/tree/main/SerratedJSInterop.Blazor</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
