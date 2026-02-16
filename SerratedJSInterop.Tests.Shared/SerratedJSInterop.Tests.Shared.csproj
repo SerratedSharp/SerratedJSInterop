@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>SerratedSharp.SerratedJSInterop.Tests.Shared</RootNamespace>
     <AssemblyName>SerratedSharp.SerratedJSInterop.Tests.Shared</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

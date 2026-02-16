@@ -1,0 +1,9 @@
+{
+  "name": "serratedjsinterop",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "pack:release": "dotnet pack SerratedJSInterop.sln -c Release -o nugetpackout",
+    "pack:debug": "dotnet pack SerratedJSInterop.sln -c Debug -o nugetpackout"
+  }
+}

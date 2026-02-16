@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SerratedSharp.SerratedDom</RootNamespace>
     <AssemblyName>SerratedSharp.SerratedDom</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

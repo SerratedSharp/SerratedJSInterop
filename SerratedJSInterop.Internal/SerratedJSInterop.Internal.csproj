@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>SerratedSharp.SerratedJSInterop.Internal</RootNamespace>
     <AssemblyName>SerratedSharp.SerratedJSInterop.Internal</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
