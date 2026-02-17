@@ -4,7 +4,7 @@ VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop", "SerratedJSInterop\SerratedJSInterop.csproj", "{615ECB11-AFD6-4261-8FAD-8FAA520A276B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop.Blazor", "SerratedJSInterop.Blazor\SerratedJSInterop.Blazor.csproj", "{5423D1CE-6D0A-474F-B431-DDBED082A390}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop.BlazorWasm", "SerratedJSInterop.BlazorWasm\SerratedJSInterop.BlazorWasm.csproj", "{5423D1CE-6D0A-474F-B431-DDBED082A390}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop.SourceGenerator", "SerratedJSInterop.SourceGenerator\SerratedJSInterop.SourceGenerator.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
@@ -20,9 +20,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop.WasmBrows
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
 		Notes.md = Notes.md
+		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerratedJSInterop.Tests.BlazorWasm", "SerratedJSInterop.Tests.BlazorWasm\SerratedJSInterop.Tests.BlazorWasm.csproj", "{3333BB01-397C-4B37-9430-2E1DB2304C2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,10 @@ Global
 		{F6A7B8C9-D0E1-2345-F012-56789ABCDEF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6A7B8C9-D0E1-2345-F012-56789ABCDEF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6A7B8C9-D0E1-2345-F012-56789ABCDEF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3333BB01-397C-4B37-9430-2E1DB2304C2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3333BB01-397C-4B37-9430-2E1DB2304C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3333BB01-397C-4B37-9430-2E1DB2304C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3333BB01-397C-4B37-9430-2E1DB2304C2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

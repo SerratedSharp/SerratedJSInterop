@@ -33,9 +33,45 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
     };
 
     HelpersShim.SetPropertyByName = function (jsObject, propertyName, value) {
-        // Use Reflect.set to properly trigger setters/proxies when present
         Reflect.set(jsObject, propertyName, value);
         return jsObject[propertyName];
+    };
+
+    var serratedPocoPrefix = 'serratedPoco:';
+    // If a string has the serratedPoco: prefix (from C# MarshalAsJson), JSON parse and return the object; else return original.
+    function unwrapSerratedPocoArg(value) {
+        if (typeof value !== 'string') return value;
+        if (value.length < serratedPocoPrefix.length) return value;
+        if (value.indexOf(serratedPocoPrefix) !== 0) return value;
+        try {
+            return JSON.parse(value.slice(serratedPocoPrefix.length));
+        } catch (e) {
+            return value;
+        }
+    }
+
+    // Call constructor with optional arguments.
+    HelpersShim.ObjectNew = function (path, args) {
+        var constructor = HelpersShim.ResolvePath(path);
+        if (typeof constructor !== 'function') {
+            throw new Error(`"${path}" is not a constructor function`);
+        }
+        if (!args || args.length === 0) return new constructor();
+        var unwrapped = args.map(unwrapSerratedPocoArg);
+        return new constructor(...unwrapped);
+    };
+
+    // Resolve a fully qualified path like "PIXI.Rectangle" to constructor
+    HelpersShim.ResolvePath = function (path) {
+        var parts = path.split('.');
+        var obj = globalThis;
+        for (var i = 0; i < parts.length; i++) {
+            if (obj === null || obj === undefined) {
+                throw new Error(`Path resolution failed at "${parts.slice(0, i + 1).join('.')}"`);
+            }
+            obj = obj[parts[i]];
+        }
+        return obj;
     };
 
     SerratedJSInteropShim.HelpersShim = HelpersShim; // add to parent namespace

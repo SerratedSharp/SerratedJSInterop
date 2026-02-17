@@ -20,6 +20,14 @@ namespace SerratedSharp.SerratedJSInterop
                 return GlobalProxy.HelpersJSProxyForDotNet.GetArrayObjectItems(jqObject);
         }
 
+        public static JSObject ObjectNew(string path, object[] args)
+        {
+            if (AgnosticRuntime.IsUnoWasmBootstrapLoaded)
+                return GlobalProxy.HelpersJSProxyForUno.ObjectNew(path, args);
+            else
+                return GlobalProxy.HelpersJSProxyForDotNet.ObjectNew(path, args);
+        }
+
     }
 }
 
@@ -39,6 +47,9 @@ namespace SerratedSharp.SerratedJSInterop
             [return: JSMarshalAs<JSType.Array<JSType.Object>>]
             public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
 
+            [JSImport(baseJSNamespace + ".ObjectNew", moduleName)]
+            public static partial JSObject ObjectNew(string path, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] args);
+
         }
 
         internal partial class HelpersJSProxyForUno
@@ -51,6 +62,9 @@ namespace SerratedSharp.SerratedJSInterop
             [JSImport(baseJSNamespace + ".GetArrayObjectItems")]
             [return: JSMarshalAs<JSType.Array<JSType.Object>>]
             public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
+
+            [JSImport(baseJSNamespace + ".ObjectNew")]
+            public static partial JSObject ObjectNew(string path, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] args);
 
         }
     }

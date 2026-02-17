@@ -8,8 +8,10 @@ namespace SerratedSharp.SerratedDom;
 /// Wraps a DOM HTMLElement for use with Serrated JS interop.
 /// </summary>
 [SupportedOSPlatform("browser")]
-public class HtmlElement : IJSObjectWrapper
+public class HtmlElement : IJSObjectWrapper<HtmlElement>
 {
+    /// <inheritdoc />
+    public static HtmlElement WrapInstance(JSObject jsObject) => new HtmlElement(jsObject);
     /// <inheritdoc />
     public JSObject JSObject => jsObject;
 
@@ -25,9 +27,7 @@ public class HtmlElement : IJSObjectWrapper
 
     /// <summary>Appends a child node (e.g. HTMLCanvasElement) to this element.</summary>
     public void AppendChild(IJSObjectWrapper child)
-    {
-        this.CallJS<object>(SerratedJS.Params(child.JSObject));
-    }
+        => this.CallJS<object>(SerratedJS.Params(child.JSObject));
 
     /// <summary>Gets or sets the raw text content of the element and its descendants.</summary>
     public string TextContent

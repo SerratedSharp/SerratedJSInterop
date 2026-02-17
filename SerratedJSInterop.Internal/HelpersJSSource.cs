@@ -16,6 +16,10 @@ namespace SerratedSharp.SerratedJSInterop
         [AgnosticJSImport("GetArrayObjectItems")]
         [return: AgnosticJSMarshalAs<JSType.Array<JSType.Object>>]
         public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
+
+        [AgnosticJSImport("ObjectNew")]
+        [return: AgnosticJSMarshalAs<JSType.Object>]
+        public static partial JSObject ObjectNew(string path, [AgnosticJSMarshalAs<JSType.Array<JSType.Any>>] object[] args);
     }
 
     // Stub implementations so this project compiles; this assembly is only used for code generation.
@@ -23,5 +27,6 @@ namespace SerratedSharp.SerratedJSInterop
     {
         public static partial Task LoadScript(string relativeUrl) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial JSObject[] GetArrayObjectItems(JSObject jqObject) => throw new NotSupportedException("This assembly is for code generation only.");
+        public static partial JSObject ObjectNew(string path, object[] args) => throw new NotSupportedException("This assembly is for code generation only.");
     }
 }
