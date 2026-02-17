@@ -118,6 +118,12 @@ public static class JSObjectExtensionsV2 {
     public static J CallJS<J>(this JSObject jsObject, string funcName, JSParams parameters = default)
         => JSImportInstanceHelpers.CallJSFunc<J>(jsObject, funcName!, parameters.Args);
 
+    public static void CallJS(this JSObject jsObject, JSParams parameters = default, [CallerMemberName] string? funcName = null)
+        => _ = JSImportInstanceHelpers.CallJSFunc<object>(jsObject, funcName!, parameters.Args);
+
+    public static void CallJS(this JSObject jsObject, string funcName, JSParams parameters = default)
+        => _ = JSImportInstanceHelpers.CallJSFunc<object>(jsObject, funcName!, parameters.Args);
+
     public static J GetProperty<J>(this JSObject jsObject, [CallerMemberName] string? propertyName = null)
         => JSImportInstanceHelpers.GetProperty<J>(jsObject, propertyName!);
 
