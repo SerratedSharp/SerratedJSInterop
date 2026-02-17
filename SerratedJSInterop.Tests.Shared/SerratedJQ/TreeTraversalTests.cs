@@ -1,11 +1,11 @@
-﻿using SerratedSharp.SerratedJQ.Plain;
+using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
 
 namespace Tests.Wasm;
 public partial class TestsContainer
 {
-    public class TreeTraversal_Children : JQTest
+    public class TreeTraversal_Children : JSTest
     {
         public override void Run()
         {
@@ -15,7 +15,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Children_Selector : JQTest
+    public class TreeTraversal_Children_Selector : JSTest
     {
         public override void Run()
         {
@@ -26,7 +26,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Closest : JQTest
+    public class TreeTraversal_Closest : JSTest
     {
         public override void Run()
         {
@@ -37,7 +37,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Find : JQTest
+    public class TreeTraversal_Find : JSTest
     {
         public override void Run()
         {
@@ -48,7 +48,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Next : JQTest
+    public class TreeTraversal_Next : JSTest
     {
         public override void Run()
         {
@@ -59,7 +59,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Next_Selector : JQTest
+    public class TreeTraversal_Next_Selector : JSTest
     {
         public override void Run()
         {
@@ -73,7 +73,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_NextAll : JQTest
+    public class TreeTraversal_NextAll : JSTest
     {
         public override void Run()
         {
@@ -84,7 +84,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_NextAll_Selector : JQTest
+    public class TreeTraversal_NextAll_Selector : JSTest
     {
         public override void Run()
         {
@@ -95,7 +95,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_NextUntil : JQTest
+    public class TreeTraversal_NextUntil : JSTest
     {
         public override void Run()
         {
@@ -106,7 +106,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_NextUntil_Selector : JQTest
+    public class TreeTraversal_NextUntil_Selector : JSTest
     {
         public override void Run()
         {
@@ -117,7 +117,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Parent : JQTest
+    public class TreeTraversal_Parent : JSTest
     {
         public override void Run()
         {
@@ -128,7 +128,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Parent_Selector : JQTest
+    public class TreeTraversal_Parent_Selector : JSTest
     {
         public override void Run()
         {
@@ -139,7 +139,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Parents : JQTest
+    public class TreeTraversal_Parents : JSTest
     {
         public override void Run()
         {
@@ -150,7 +150,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Parents_Selector : JQTest
+    public class TreeTraversal_Parents_Selector : JSTest
     {
         public override void Run()
         {
@@ -161,7 +161,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_ParentsUntil : JQTest
+    public class TreeTraversal_ParentsUntil : JSTest
     {
         public override void Run()
         {
@@ -172,7 +172,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_ParentsUntil_Selector : JQTest
+    public class TreeTraversal_ParentsUntil_Selector : JSTest
     {
         public override void Run()
         {
@@ -184,7 +184,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Prev : JQTest
+    public class TreeTraversal_Prev : JSTest
     {
         public override void Run()
         {
@@ -195,7 +195,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Prev_Selector : JQTest
+    public class TreeTraversal_Prev_Selector : JSTest
     {
         public override void Run()
         {
@@ -209,7 +209,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_PrevAll : JQTest
+    public class TreeTraversal_PrevAll : JSTest
     {
         public override void Run()
         {
@@ -220,7 +220,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_PrevAll_Selector : JQTest
+    public class TreeTraversal_PrevAll_Selector : JSTest
     {
         public override void Run()
         {
@@ -231,7 +231,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_PrevUntil : JQTest
+    public class TreeTraversal_PrevUntil : JSTest
     {
         public override void Run()
         {
@@ -242,7 +242,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_PrevUntil_Selector : JQTest
+    public class TreeTraversal_PrevUntil_Selector : JSTest
     {
         public override void Run()
         {
@@ -253,7 +253,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Siblings : JQTest
+    public class TreeTraversal_Siblings : JSTest
     {
         public override void Run()
         {
@@ -264,7 +264,7 @@ public partial class TestsContainer
         }
     }
 
-    public class TreeTraversal_Siblings_Selector : JQTest
+    public class TreeTraversal_Siblings_Selector : JSTest
     {
         public override void Run()
         {
@@ -275,6 +275,3 @@ public partial class TestsContainer
         }
     }
 }
-
-
-

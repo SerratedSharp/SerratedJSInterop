@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJQ.Plain;
+using SerratedSharp.SerratedJQ.Plain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    public class ElementManipulation_AddClass_HasClass : JQTest
+    public class ElementManipulation_AddClass_HasClass : JSTest
     {
         public override void Run()
         {
@@ -36,7 +36,7 @@ public partial class TestsContainer
     }
 
 
-    public class MoveElsewhere_Append_TwoJQ : JQTest
+    public class MoveElsewhere_Append_TwoJQ : JSTest
     {
         public override void Run()
         {
@@ -47,7 +47,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MoveElsewhere_Append_ThreeJQ : JQTest
+    public class MoveElsewhere_Append_ThreeJQ : JSTest
     {
         public override void Run()
         {

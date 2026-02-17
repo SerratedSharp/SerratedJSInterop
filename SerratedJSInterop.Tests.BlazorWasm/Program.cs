@@ -39,7 +39,7 @@ public class Program
 
     private static async Task SetupInterop()
     {
-        await JSInteropHelpersModule.ImportAsync();
+        await SerratedJSInteropModule.ImportAsync();
         // Legacy InteropHelpers, needed to support SerratedJQ which still uses old.
         await SerratedSharp.SerratedJQ.SerratedJQModule.ImportAsync("..");
         await SerratedSharp.SerratedJQ.SerratedJQModule.LoadJQuery("https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js");

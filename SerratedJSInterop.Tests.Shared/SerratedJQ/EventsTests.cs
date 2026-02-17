@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -11,7 +11,7 @@ public partial class TestsContainer
     {
         // private readonly JQTest test;
 
-        public TestHandler(JQTest test)
+        public TestHandler(JSTest test)
         {
             //this.test = test;
         }
@@ -37,7 +37,7 @@ public partial class TestsContainer
         //};
     }
 
-    public class Events_Click : JQTest
+    public class Events_Click : JSTest
     {
         public override void Run()
         {
@@ -59,7 +59,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_Click2 : JQTest
+    public class Events_Click2 : JSTest
     {
         public override void Run()
         {
@@ -76,7 +76,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_Click_Remove : JQTest
+    public class Events_Click_Remove : JSTest
     {
         public override void Run()
         {
@@ -90,7 +90,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_Input : JQTest
+    public class Events_Input : JSTest
     {
         public override void Run()
         {
@@ -104,7 +104,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_Change : JQTest
+    public class Events_Change : JSTest
     {
         public override void Run()
         {
@@ -118,7 +118,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_On_Click : JQTest
+    public class Events_On_Click : JSTest
     {
         public override void Run()
         {
@@ -132,7 +132,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Events_On_Click_Selector : JQTest
+    public class Events_On_Click_Selector : JSTest
     {
         public override void Run()
         {

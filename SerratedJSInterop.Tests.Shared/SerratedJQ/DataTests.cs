@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
@@ -19,7 +19,7 @@ public partial class TestsContainer
         public string Name { get; set; }
     }
 
-    public class Data_Data_String : JQTest
+    public class Data_Data_String : JSTest
     {
         public override void Run()
         {
@@ -32,7 +32,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Data_Data_JSObject : JQTest
+    public class Data_Data_JSObject : JSTest
     {
         public override void Run()
         {
@@ -70,7 +70,7 @@ public partial class TestsContainer
     //    }
     //}
 
-    public class Data_Data_ManagedObject : JQTest
+    public class Data_Data_ManagedObject : JSTest
     {
         public override void Run()
         {
@@ -85,7 +85,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Data_Data_MemoryLoadTest : JQTest
+    public class Data_Data_MemoryLoadTest : JSTest
     {
         public override void Run()
         {

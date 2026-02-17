@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJQ.Plain;
+using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
 
@@ -7,7 +7,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
 
-    public class Filtering_First : JQTest
+    public class Filtering_First : JSTest
     {
         public override void Run()
         {
@@ -18,7 +18,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Last : JQTest
+    public class Filtering_Last : JSTest
     {
         public override void Run()
         {
@@ -29,7 +29,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Even : JQTest
+    public class Filtering_Even : JSTest
     {
         public override void Run()
         {
@@ -42,7 +42,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Odd : JQTest
+    public class Filtering_Odd : JSTest
     {
         public override void Run()
         {
@@ -54,7 +54,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Eq : JQTest
+    public class Filtering_Eq : JSTest
     {
         public override void Run()
         {
@@ -65,7 +65,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Filter : JQTest
+    public class Filtering_Filter : JSTest
     {
         public override void Run()
         {
@@ -76,7 +76,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Not : JQTest
+    public class Filtering_Not : JSTest
     {
         public override void Run()
         {
@@ -90,7 +90,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Slice : JQTest
+    public class Filtering_Slice : JSTest
     {
         public override void Run()
         {
@@ -102,7 +102,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Is : JQTest
+    public class Filtering_Is : JSTest
     {
         public override void Run()
         {
@@ -111,7 +111,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Filtering_Has : JQTest
+    public class Filtering_Has : JSTest
     {
         public override void Run()
         {

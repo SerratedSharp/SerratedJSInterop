@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
@@ -7,7 +7,7 @@ using Wasm;
 namespace Tests.Wasm;
 public partial class TestsContainer
 {
-    public class InsertionInside_Append : JQTest
+    public class InsertionInside_Append : JSTest
     {
         public override void Run()
         {
@@ -19,7 +19,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_Append_Object : JQTest
+    public class InsertionInside_Append_Object : JSTest
     {
         public override void Run()
         {
@@ -31,7 +31,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_Append_HtmlElement: JQTest
+    public class InsertionInside_Append_HtmlElement: JSTest
     {
         public override void Run()
         {
@@ -44,7 +44,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_AppendTo : JQTest
+    public class InsertionInside_AppendTo : JSTest
     {
         public override void Run()
         {
@@ -57,7 +57,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_AppendTo_Object : JQTest
+    public class InsertionInside_AppendTo_Object : JSTest
     {
         public override void Run()
         {
@@ -69,7 +69,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_Prepend : JQTest
+    public class InsertionInside_Prepend : JSTest
     {
         public override void Run()
         {
@@ -82,7 +82,7 @@ public partial class TestsContainer
     }
 
     // TODO: Fix .Prepend taking an object.  Possibly an issue with ParseHtml wrapping
-    public class InsertionInside_Prepend_HtmlObject : JQTest
+    public class InsertionInside_Prepend_HtmlObject : JSTest
     {
         public override void Run()
         {
@@ -94,7 +94,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_Prepend_Object : JQTest
+    public class InsertionInside_Prepend_Object : JSTest
     {
         public override void Run()
         {
@@ -107,7 +107,7 @@ public partial class TestsContainer
     }
 
 
-    public class InsertionInside_PrependTo : JQTest
+    public class InsertionInside_PrependTo : JSTest
     {
         public override void Run()
         {
@@ -120,7 +120,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_PrependTo_Object : JQTest
+    public class InsertionInside_PrependTo_Object : JSTest
     {
         public override void Run()
         {
@@ -133,7 +133,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionInside_PrependTo_Object2 : JQTest
+    public class InsertionInside_PrependTo_Object2 : JSTest
     {
         public override void Run()
         {

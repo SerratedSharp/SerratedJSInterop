@@ -47,14 +47,14 @@ public class TestOrchestrator
 
         // Iterate through all JQTest classes and add them to the Test Orchestrator
         var types = System.Reflection.Assembly.GetAssembly(typeof(TestOrchestrator)).GetTypes()
-            .Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(JQTest)))
+            .Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(JSTest)))
             .ToList();
         Console.WriteLine("Types found: " + types.Count);
 
         foreach (Type type in types)
         {
             Console.WriteLine("Class " + type.Name);
-            orch.Tests.Add((JQTest)Activator.CreateInstance(type));
+            orch.Tests.Add((JSTest)Activator.CreateInstance(type));
         }
         // Run the Orchestrator, which will in turn run all tests
         orch.Run();
@@ -105,7 +105,7 @@ public interface IJQTest
     void Run();
 }
 
-public abstract class JQTest : IJQTest
+public abstract class JSTest : IJQTest
 {
     JQueryPlainObject body = JQueryPlain.Select("body");
     public int TestNum { get; set; }
@@ -115,7 +115,7 @@ public abstract class JQTest : IJQTest
     protected JQueryPlainObject result;
     //protected JQueryBoxV2<TestModel> tcm;// test container with model
 
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(JQTest))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(JSTest))]
 
     public virtual void Run() { }
 

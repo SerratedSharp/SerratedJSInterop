@@ -1,3 +1,5 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace SerratedSharp.SerratedJSInterop;
 
 using SerratedSharp.SerratedJSInterop.Internal;
@@ -6,23 +8,10 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 
-public static class JSImportInstanceHelpers
+internal static class JSImportInstanceHelpers
 {
-    // J should be a JSObject or other primitive JS type
-    public static J GetPropertyOfSameName<J>(JSObject jsObject, Breaker _ = default(Breaker), [CallerMemberName] string? propertyName = null)
-    {
-        return GetProperty<J>(jsObject, propertyName!);
-    }
 
-    // Added: Returns property as a wrapped instance of W
-    public static W GetPropertyOfSameNameAsWrapped<W>(JSObject jsObject, Breaker _ = default(Breaker), [CallerMemberName] string? propertyName = null)
-        where W : IJSObjectWrapper<W>
-    {
-        JSObject jsProp = GetPropertyOfSameName<JSObject>(jsObject, _, propertyName);
-        return W.WrapInstance(jsProp);
-    }
-
-    // J can be JSObject, primitive, or IJSObjectWrapper<J> (uses CastOrWrap like CallJSFunc)
+    // J can be JSObject, primitive, or IJSObjectWrapper<J>
     public static J GetProperty<J>(JSObject jsObject, string propertyName)
     {
         object? genericObject = InstanceHelperJS.PropertyByNameToObject(jsObject, ToJSCasing(propertyName));
@@ -31,23 +20,6 @@ public static class JSImportInstanceHelpers
 
     public static void SetProperty(JSObject jsObject, string propertyName, object value)
         => InstanceHelperJS.SetPropertyByName(jsObject, ToJSCasing(propertyName), value);
-
-    public static void SetPropertyOfSameName(JSObject jsObject, object value, Breaker _ = default(Breaker), [CallerMemberName] string? propertyName = null)
-        => SetProperty(jsObject, propertyName!, value);
-
-    // This call automatically wraps a JSObject using type W's WrapInstance interface
-    public static W CallJSOfSameNameAsWrapped<W>(JSObject jsObject, object[] parameters, Breaker _ = default(Breaker), [CallerMemberName] string? funcName = null)
-        where W : IJSObjectWrapper<W>
-    {
-        JSObject jsObjectRtn = CallJSOfSameName<JSObject>(jsObject, parameters, _, funcName);
-        return W.WrapInstance(jsObjectRtn);
-    }
-
-    // J should be a JSObject or other primitive JS type
-    public static J CallJSOfSameName<J>(JSObject jsObject, object[] parameters, Breaker _ = default(Breaker), [CallerMemberName] string? funcName = null)
-    {
-        return CallJSFunc<J>(jsObject, funcName!, parameters);
-    }
 
     // J should be a JSObject, IJSObjectWrapper<J>, or other primitive JS type
     public static J CallJSFunc<J>(JSObject jsObject, string funcName, params object[] parameters)
@@ -77,10 +49,7 @@ public static class JSImportInstanceHelpers
         return CastOrWrap<J>(genericObject);
     }
 
-    /// <summary>
-    /// Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
-    /// Used by GetProperty, CallJSFunc, and SerratedJS.New&lt;J&gt; (when generic overload is used).
-    /// </summary>
+    // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
     internal static J CastOrWrap<J>(object? genericObject)
     {
         Type type = typeof(J);
@@ -164,10 +133,9 @@ public static class JSImportInstanceHelpers
         }
     }
 
-    /// <summary>
-    /// Returns IJSObjectWrapper&lt;T&gt; if type T implements it (i.e. T : IJSObjectWrapper&lt;T&gt;); otherwise null.
-    /// Avoids MakeGenericType with types that don't satisfy the constraint (e.g. JSObject, primitives).
-    /// </summary>
+    
+    // Returns IJSObjectWrapper&lt;T&gt; if type T implements it (i.e. T : IJSObjectWrapper<T>); otherwise null.
+    // Avoids MakeGenericType with types that don't satisfy the constraint (e.g. JSObject, primitives).
     private static Type? TryGetIJSObjectWrapperOfSelf(Type type)
     {
         if (!typeof(IJSObjectWrapper).IsAssignableFrom(type))
@@ -186,6 +154,7 @@ public static class JSImportInstanceHelpers
         return null;
     }
 
+    // TODO: Add option to suppress casing adjustments
     // lower cases first character
     public static string ToJSCasing(string identifier)
         => Char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);

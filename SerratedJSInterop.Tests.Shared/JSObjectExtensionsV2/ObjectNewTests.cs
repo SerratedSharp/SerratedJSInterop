@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    public class New_JSObject_NoArgs : JQTest
+    public class New_JSObject_NoArgs : JSTest
     {
         public override void Run()
         {
@@ -17,7 +17,7 @@ public partial class TestsContainer
         }
     }
 
-    public class New_JSObject_WithArgs : JQTest
+    public class New_JSObject_WithArgs : JSTest
     {
         public override void Run()
         {
@@ -29,7 +29,7 @@ public partial class TestsContainer
         }
     }
 
-    public class New_JSObject_Image_ThenWrapImage : JQTest
+    public class New_JSObject_Image_ThenWrapImage : JSTest
     {
         public override void Run()
         {
@@ -44,7 +44,7 @@ public partial class TestsContainer
         }
     }
 
-    public class New_AsWrapped_DomElementProxy : JQTest
+    public class New_AsWrapped_DomElementProxy : JSTest
     {
         public override void Run()
         {
@@ -56,7 +56,7 @@ public partial class TestsContainer
         }
     }
 
-    public class New_WithMarshalAsJson_CustomEvent : JQTest
+    public class New_WithMarshalAsJson_CustomEvent : JSTest
     {
         public override void Run()
         {
@@ -67,7 +67,7 @@ public partial class TestsContainer
         }
     }
 
-    public class New_NoArgs_EmptyParams : JQTest
+    public class New_NoArgs_EmptyParams : JSTest
     {
         public override void Run()
         {
@@ -76,7 +76,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Image_ParameterlessConstructor : JQTest
+    public class Image_ParameterlessConstructor : JSTest
     {
         public override void Run()
         {

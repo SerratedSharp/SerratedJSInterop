@@ -16,13 +16,17 @@ public readonly struct JSParams
     }
 }
 
+
+
 /// <summary>
 /// Factory for JSParams. Use Params(...) so explicit arrays are passed as a single argument when desired.
 /// </summary>
 public static class SerratedJS
 {
+    // CONSIDER: Checking parameters for IJSObjectWrapper and conditionally do paramItem.JSObject to pass the native object autoamtically.
+
     /// <summary>
-    /// Multiple arguments or no arguments. Note: To explicitly pass a single array object[] parameter and avoid unintentional expansion ton multiple parameters, use <c>.ArrayParam()</c>.
+    /// Multiple arguments or no arguments. Note: To explicitly pass a single array object[] parameter and avoid unintentional expansion to multiple parameters, use <c>.ArrayParam()</c>.
     /// </summary>
     public static JSParams Params(params object[] parameters)
     {
@@ -66,15 +70,6 @@ public static class SerratedJS
         return HelpersJS.ObjectNew(typePath, unwrapped);
     }
 
-    ///// <summary>
-    ///// Calls JS constructor for `typePath` type name and namespace if required.  E.g. "PIXI.Rectangle", "Image". Returns type J, where J implements <see cref="IJSObjectWrapper{J}"/>.
-    ///// Use `SerratedJS.Params("param1", 2)` if passing constructor arguments.
-    ///// Consider using non-generic SerratedJS.New("typeName") if implementing wrapper.
-    ///// </summary>
-    ///// <typeparam name="J">A type implementing <see cref="IJSObjectWrapper{J}"/> (e.g. HtmlElement, Image, DomElementProxy).</typeparam>
-    ///// <param name="typePath">JS constructor name. Include fully qualified path if necessary.</param>
-    ///// <param name="parameters">Optional constructor arguments (e.g. SerratedJS.Params(0, 0, 100, 100)).</param>
-    ///// <returns>Requested J wrapping the new JSObject instance via <c>IJSObjectWrapper{J}.AsWrapped()</c> instance.</returns>
     // CONSIDER: Whether we need this overload.  If there is a wrapper type J, then it should probably just implement `JSObject = SerratedJS.New("type")`.  The only time an auto-wrapping New makes sense is if the wrapper didn't implement JS interop constructor, and instead relied on factory.  Even then we can just called the constructor taking JSObject.
     //public static J New<J>(string typePath, JSParams parameters = default) where J : IJSObjectWrapper<J>
     //{
@@ -89,7 +84,7 @@ public static class SerratedJS
 }
 
 /// <summary>
-/// V2 extension methods: CallJS with SerratedJS.Params and [CallerMemberName] for function name.
+/// IJSObjectWrapper extensions
 /// </summary>
 public static class IJSObjectWrapperExtensionsV2
 {
@@ -99,17 +94,19 @@ public static class IJSObjectWrapperExtensionsV2
     public static J CallJS<J>(this IJSObjectWrapper wrapper, string? funcName, JSParams parameters = default)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, parameters.Args);
 
-
     public static J GetProperty<J>(this IJSObjectWrapper wrapper, [CallerMemberName] string? propertyName = null)
         => JSImportInstanceHelpers.GetProperty<J>(wrapper.JSObject, propertyName!);
 
     public static void SetProperty(this IJSObjectWrapper wrapper, object value, [CallerMemberName] string? propertyName = null)
     {
         object valueToSet = value is IJSObjectWrapper w ? w.JSObject : value;
-       JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName!, valueToSet);
+        JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName!, valueToSet);
     }
 }
 
+/// <summary>
+/// JSObject extensions
+/// </summary>
 public static class JSObjectExtensionsV2 {
 
     public static J CallJS<J>(this JSObject jsObject, JSParams parameters = default, [CallerMemberName] string? funcName = null)

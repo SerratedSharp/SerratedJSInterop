@@ -7,7 +7,7 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    public class Document_GetDocument_NotNull : JQTest
+    public class Document_GetDocument_NotNull : JSTest
     {
         public override void Run()
         {
@@ -17,7 +17,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Document_Body_NotNull : JQTest
+    public class Document_Body_NotNull : JSTest
     {
         public override void Run()
         {
@@ -28,7 +28,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Document_CreateElement_Div : JQTest
+    public class Document_CreateElement_Div : JSTest
     {
         public override void Run()
         {
@@ -41,7 +41,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Document_CreateElement_Span : JQTest
+    public class Document_CreateElement_Span : JSTest
     {
         public override void Run()
         {
@@ -53,7 +53,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Document_GetElementById : JQTest
+    public class Document_GetElementById : JSTest
     {
         public override void Run()
         {
@@ -67,7 +67,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Document_GetElementById_Missing : JQTest
+    public class Document_GetElementById_Missing : JSTest
     {
         public override void Run()
         {

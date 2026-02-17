@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using System.Linq;
@@ -11,7 +11,7 @@ public partial class TestsContainer
 
     // General Attributes - https://api.jquery.com/category/attributes/general-attributes/
 
-    public class GeneralAttributes_Attr_String : JQTest
+    public class GeneralAttributes_Attr_String : JSTest
     {
         public override void Run()
         {
@@ -23,7 +23,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Attr_Number : JQTest
+    public class GeneralAttributes_Attr_Number : JSTest
     {
         public override void Run()
         {
@@ -35,7 +35,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Attr_Number2 : JQTest
+    public class GeneralAttributes_Attr_Number2 : JSTest
     {
         public override void Run()
         {
@@ -47,7 +47,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_RemoveAttr : JQTest
+    public class GeneralAttributes_RemoveAttr : JSTest
     {
         public override void Run()
         {
@@ -61,7 +61,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Val_String : JQTest
+    public class GeneralAttributes_Val_String : JSTest
     {
         public override void Run()
         {
@@ -72,7 +72,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Val_Number : JQTest
+    public class GeneralAttributes_Val_Number : JSTest
     {
         public override void Run()
         {
@@ -83,7 +83,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Val_Number2 : JQTest
+    public class GeneralAttributes_Val_Number2 : JSTest
     {
         public override void Run()
         {
@@ -94,7 +94,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Val_StringArray : JQTest
+    public class GeneralAttributes_Val_StringArray : JSTest
     {
         public override void Run()
         {
@@ -111,7 +111,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_Prop_String : JQTest
+    public class GeneralAttributes_Prop_String : JSTest
     {
         public override void Run()
         {
@@ -133,7 +133,7 @@ public partial class TestsContainer
     //    }
     //}
 
-    public class GeneralAttributes_Prop_Number2 : JQTest
+    public class GeneralAttributes_Prop_Number2 : JSTest
     {
         public override void Run()
         {
@@ -144,7 +144,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GeneralAttributes_RemoveProp : JQTest
+    public class GeneralAttributes_RemoveProp : JSTest
     {
         public override void Run()
         {

@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -10,7 +10,7 @@ public partial class TestsContainer
 
     // Class Attributes - https://api.jquery.com/category/manipulation/class-attribute/
 
-    public class ClassAttributes_HasClass : JQTest
+    public class ClassAttributes_HasClass : JSTest
     {
         public override void Run()
         {
@@ -21,7 +21,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_AddClass : JQTest
+    public class ClassAttributes_AddClass : JSTest
     {
         public override void Run()
         {
@@ -33,7 +33,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_AddClass_Array : JQTest
+    public class ClassAttributes_AddClass_Array : JSTest
     {
         public override void Run()
         {
@@ -45,7 +45,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_RemoveClass : JQTest
+    public class ClassAttributes_RemoveClass : JSTest
     {
         public override void Run()
         {
@@ -58,7 +58,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_RemoveClass_Array : JQTest
+    public class ClassAttributes_RemoveClass_Array : JSTest
     {
         public override void Run()
         {
@@ -73,7 +73,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_ToggleClass : JQTest
+    public class ClassAttributes_ToggleClass : JSTest
     {
         public override void Run()
         {
@@ -85,7 +85,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_ToggleClass_WithForce : JQTest
+    public class ClassAttributes_ToggleClass_WithForce : JSTest
     {
         public override void Run()
         {
@@ -97,7 +97,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_ToggleClass_WithForceFalse : JQTest
+    public class ClassAttributes_ToggleClass_WithForceFalse : JSTest
     {
         public override void Run()
         {
@@ -109,7 +109,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_ToggleClass_WithForceTrueAndForceFalse : JQTest
+    public class ClassAttributes_ToggleClass_WithForceTrueAndForceFalse : JSTest
     {
         public override void Run()
         {
@@ -122,7 +122,7 @@ public partial class TestsContainer
         }
     }
 
-    public class ClassAttributes_ToggleClass_Array : JQTest
+    public class ClassAttributes_ToggleClass_Array : JSTest
     {
         public override void Run()
         {
@@ -135,7 +135,3 @@ public partial class TestsContainer
     }
 
 }
-
-
-
-

@@ -18,8 +18,8 @@ internal class Program
 
         //await JSInteropHelpersModule.ImportAsync("", "./SerratedInteropHelpers.js");
         
-        // TODO: This depends on the .Blazor project because it is the RCL packaging the JS dependency.  We probably need to make the non-RCL root .SerratedJSInterop project a RCL project with the file.
-        await JSInteropHelpersModule.ImportAsync();
+        // SerratedJSInterop 
+        await SerratedJSInteropModule.ImportAsync();
         
         // Legacy InteropHelpers, needed to support SerratedJQ which still uses old.
         await SerratedSharp.SerratedJQ.SerratedJQModule.ImportAsync("..");

@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
     // DOM Insertion, Outside - https://api.jquery.com/category/manipulation/dom-insertion-outside/
-    public class InsertionOutside_InsertAfter : JQTest
+    public class InsertionOutside_InsertAfter : JSTest
     {
 
         public override void Run()
@@ -23,7 +23,7 @@ public partial class TestsContainer
     }
 
 
-    public class InsertionOutside_InsertAfter_Object : JQTest
+    public class InsertionOutside_InsertAfter_Object : JSTest
     {
 
         public override void Run()
@@ -36,7 +36,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_InsertBefore : JQTest
+    public class InsertionOutside_InsertBefore : JSTest
     {
 
         public override void Run()
@@ -49,7 +49,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_InsertBefore_Object : JQTest
+    public class InsertionOutside_InsertBefore_Object : JSTest
     {
         public override void Run()
         {
@@ -61,7 +61,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_After : JQTest
+    public class InsertionOutside_After : JSTest
     {
         public override void Run()
         {
@@ -73,7 +73,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_After_Strings2 : JQTest
+    public class InsertionOutside_After_Strings2 : JSTest
     {
         public override void Run()
         {
@@ -85,7 +85,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_After_Object : JQTest
+    public class InsertionOutside_After_Object : JSTest
     {
         public override void Run()
         {
@@ -97,7 +97,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_Before : JQTest
+    public class InsertionOutside_Before : JSTest
     {
         public override void Run()
         {
@@ -109,7 +109,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_Before_TwoString : JQTest
+    public class InsertionOutside_Before_TwoString : JSTest
     {
         public override void Run()
         {
@@ -121,7 +121,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionOutside_Before_Object : JQTest
+    public class InsertionOutside_Before_Object : JSTest
     {
         public override void Run()
         {

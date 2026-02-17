@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
 
-    public class InsertionAround_Unwrap : JQTest
+    public class InsertionAround_Unwrap : JSTest
     {
         public override void Run()
         {
@@ -20,7 +20,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionAround_Wrap : JQTest
+    public class InsertionAround_Wrap : JSTest
     {
         public override void Run()
         {
@@ -32,7 +32,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionAround_Wrap_Object : JQTest
+    public class InsertionAround_Wrap_Object : JSTest
     {
         public override void Run()
         {
@@ -44,7 +44,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionAround_WrapAll : JQTest
+    public class InsertionAround_WrapAll : JSTest
     {
         public override void Run()
         {
@@ -56,7 +56,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionAround_WrapAll_Object : JQTest
+    public class InsertionAround_WrapAll_Object : JSTest
     {
         public override void Run()
         {
@@ -68,7 +68,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InsertionAround_WrapInner : JQTest
+    public class InsertionAround_WrapInner : JSTest
     {
         public override void Run()
         {

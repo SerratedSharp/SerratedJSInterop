@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using System.Runtime.InteropServices.JavaScript;
@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    public class InstanceProperties_Length : JQTest
+    public class InstanceProperties_Length : JSTest
     {
         public override void Run()
         {
@@ -18,7 +18,7 @@ public partial class TestsContainer
         }
     }
 
-    public class InstanceProperties_JQueryVersion : JQTest
+    public class InstanceProperties_JQueryVersion : JSTest
     {
         public override void Run()
         {
@@ -29,7 +29,7 @@ public partial class TestsContainer
     }
 
     // Updated test: use jQuery append, avoid calling appendChild on jQuery object
-    public class InstanceProperties_AsWrapped_ParentElement : JQTest
+    public class InstanceProperties_AsWrapped_ParentElement : JSTest
     {
         public override void Run()
         {
@@ -60,8 +60,7 @@ public partial class TestsContainer
             _ = tc.JSObject.CallJS<object>("append", SerratedJS.Params(parentDiv));
 
             // Act: fetch parentElement wrapped
-            var parentWrapped = JSImportInstanceHelpers.GetPropertyOfSameNameAsWrapped<DomElementProxy>(childDiv, propertyName: "ParentElement");
-
+            var parentWrapped = childDiv.GetProperty<DomElementProxy>(propertyName: "ParentElement");
             // Assert
             Assert(parentWrapped != null, "Wrapped parent element is null");
             Assert(parentWrapped.Id == "parent-id", "parentElement did not wrap correctly or wrong element returned");
@@ -69,7 +68,7 @@ public partial class TestsContainer
     }
 
     // New test: exercise extension method GetPropertyOfSameNameAsWrapped<W>
-    public class InstanceProperties_Extension_AsWrapped_ParentElement : JQTest
+    public class InstanceProperties_Extension_AsWrapped_ParentElement : JSTest
     {
         public override void Run()
         {

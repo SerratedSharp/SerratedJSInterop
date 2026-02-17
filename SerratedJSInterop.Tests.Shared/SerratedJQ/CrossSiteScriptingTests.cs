@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJQ.Plain;
+using SerratedSharp.SerratedJQ.Plain;
 using Wasm;
 
 namespace Tests.Wasm;
@@ -6,7 +6,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
 
-    public class Xss_ScriptTag : JQTest
+    public class Xss_ScriptTag : JSTest
     {
         public override void Run()
         {

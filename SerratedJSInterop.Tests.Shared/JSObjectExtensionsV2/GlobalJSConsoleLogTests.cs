@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
 
-    public class GlobalJS_Console_Log_SeparateParameters_MixedTypes : JQTest
+    public class GlobalJS_Console_Log_SeparateParameters_MixedTypes : JSTest
     {
         public override void Run()
         {
@@ -29,7 +29,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GlobalJS_Console_Log_SeparateParameters_PrimitivesOnly : JQTest
+    public class GlobalJS_Console_Log_SeparateParameters_PrimitivesOnly : JSTest
     {
         public override void Run()
         {

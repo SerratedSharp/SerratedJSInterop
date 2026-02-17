@@ -13,7 +13,7 @@ public partial class TestsContainer
     static readonly object optionsPoco = new { key = "value", num = 42 };
 
     /// <summary>IJSObjectWrapperExtensionsV2.CallJS(JSParams, [CallerMemberName]) with MarshalAsJson in params.</summary>
-    public class MarshalAsJson_IJSObjectWrapper_CallJS_CallerMemberName : JQTest
+    public class MarshalAsJson_IJSObjectWrapper_CallJS_CallerMemberName : JSTest
     {
         public override void Run()
         {
@@ -26,7 +26,7 @@ public partial class TestsContainer
     }
 
     /// <summary>IJSObjectWrapperExtensionsV2.CallJS(string funcName, JSParams) with MarshalAsJson in params.</summary>
-    public class MarshalAsJson_IJSObjectWrapper_CallJS_ExplicitFuncName : JQTest
+    public class MarshalAsJson_IJSObjectWrapper_CallJS_ExplicitFuncName : JSTest
     {
         public override void Run()
         {
@@ -37,7 +37,7 @@ public partial class TestsContainer
     }
 
     /// <summary>IJSObjectWrapperExtensionsV2.GetProperty with MarshalAsJson (read back property set with MarshalAsJson).</summary>
-    public class MarshalAsJson_IJSObjectWrapper_GetProperty : JQTest
+    public class MarshalAsJson_IJSObjectWrapper_GetProperty : JSTest
     {
         public override void Run()
         {
@@ -50,7 +50,7 @@ public partial class TestsContainer
     }
 
     /// <summary>IJSObjectWrapperExtensionsV2.SetProperty with MarshalAsJson value.</summary>
-    public class MarshalAsJson_IJSObjectWrapper_SetProperty : JQTest
+    public class MarshalAsJson_IJSObjectWrapper_SetProperty : JSTest
     {
         public override void Run()
         {
@@ -63,7 +63,7 @@ public partial class TestsContainer
     }
 
     /// <summary>JSObjectExtensionsV2.CallJS(JSParams, [CallerMemberName]) with MarshalAsJson in params.</summary>
-    public class MarshalAsJson_JSObject_CallJS_CallerMemberName : JQTest
+    public class MarshalAsJson_JSObject_CallJS_CallerMemberName : JSTest
     {
         public override void Run()
         {
@@ -76,7 +76,7 @@ public partial class TestsContainer
     }
 
     /// <summary>JSObjectExtensionsV2.CallJS(string funcName, JSParams) with MarshalAsJson in params.</summary>
-    public class MarshalAsJson_JSObject_CallJS_ExplicitFuncName : JQTest
+    public class MarshalAsJson_JSObject_CallJS_ExplicitFuncName : JSTest
     {
         public override void Run()
         {
@@ -87,7 +87,7 @@ public partial class TestsContainer
     }
 
     /// <summary>JSObjectExtensionsV2.GetProperty with MarshalAsJson (read back property set with MarshalAsJson). Set via wrapper so we only assert JSObject.GetProperty.</summary>
-    public class MarshalAsJson_JSObject_GetProperty : JQTest
+    public class MarshalAsJson_JSObject_GetProperty : JSTest
     {
         public override void Run()
         {
@@ -103,7 +103,7 @@ public partial class TestsContainer
     }
 
     /// <summary>JSObjectExtensionsV2.SetProperty with MarshalAsJson value. Verifies SetProperty is invoked and primitive round-trips; options object readback may be null in some hosts.</summary>
-    public class MarshalAsJson_JSObject_SetProperty : JQTest
+    public class MarshalAsJson_JSObject_SetProperty : JSTest
     {
         public override void Run()
         {

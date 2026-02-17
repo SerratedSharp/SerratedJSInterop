@@ -2,6 +2,7 @@ using System;
 
 namespace SerratedSharp.SerratedJSInterop;
 
+[Obsolete("Not part of finalized API.  May be removed in future release, or adjusted during finalization.")]
 public static class ParamsHelpers
 {
     // Shorthand for new object[]{,,,}

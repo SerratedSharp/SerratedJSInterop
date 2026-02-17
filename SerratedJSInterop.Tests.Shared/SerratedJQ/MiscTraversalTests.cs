@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -6,7 +6,7 @@ using Wasm;
 namespace Tests.Wasm;
 public partial class TestsContainer
 {
-    public class MiscTraversal_Add : JQTest
+    public class MiscTraversal_Add : JSTest
     {
         public override void Run()
         {
@@ -20,7 +20,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_Add_Object : JQTest
+    public class MiscTraversal_Add_Object : JSTest
     {
         public override void Run()
         {
@@ -31,7 +31,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_AddSelectorWithContext : JQTest
+    public class MiscTraversal_AddSelectorWithContext : JSTest
     {
         public override void Run()
         {
@@ -42,7 +42,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_AddBack : JQTest
+    public class MiscTraversal_AddBack : JSTest
     {
         public override void Run()
         {
@@ -53,7 +53,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_AddBackSelector : JQTest
+    public class MiscTraversal_AddBackSelector : JSTest
     {
         public override void Run()
         {
@@ -65,7 +65,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_Contents : JQTest
+    public class MiscTraversal_Contents : JSTest
     {
         public override void Run()
         {
@@ -77,7 +77,7 @@ public partial class TestsContainer
         }
     }
 
-    public class MiscTraversal_End : JQTest
+    public class MiscTraversal_End : JSTest
     {
         public override void Run()
         {
