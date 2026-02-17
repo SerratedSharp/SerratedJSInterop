@@ -23,6 +23,9 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
     };
 
     HelpersShim.FuncByNameToObject = function (jsObject, funcName, params) {
+        if (params && params.length > 0) {
+            params = params.map(unwrapSerratedPocoArg);
+        }
         const rtn = jsObject[funcName].apply(jsObject, params);
         return rtn;
     };
@@ -33,6 +36,7 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
     };
 
     HelpersShim.SetPropertyByName = function (jsObject, propertyName, value) {
+        value = unwrapSerratedPocoArg(value);
         Reflect.set(jsObject, propertyName, value);
         return jsObject[propertyName];
     };
