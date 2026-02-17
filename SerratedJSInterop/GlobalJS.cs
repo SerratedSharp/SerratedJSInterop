@@ -6,15 +6,14 @@ namespace SerratedSharp.SerratedJSInterop
     {
         public static class Console
         {
-            static Lazy<JSObject> _console = new(() => JSHost.GlobalThis.GetPropertyAsJSObject("console"));
+            static Lazy<JSObject> _console = new(() => JSHost.GlobalThis.GetProperty<JSObject>("console"));
 
             /// <summary>
-            /// console.log, but note all params gets logged as a single array
+            /// console.log(...)
             /// </summary>
-            /// <param name="parameters">JSObjects or strings to log.</param>
             public static void Log(params object[] parameters)
             {
-                JSImportInstanceHelpers.CallJSOfSameName<object>(_console.Value, parameters);
+                _console.Value.CallJS(SerratedJS.Params(parameters));
             }
         }
     }
