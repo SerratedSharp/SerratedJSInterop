@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 // DOM Replacement - https://api.jquery.com/category/manipulation/dom-replacement/
 public partial class TestsContainer
 {
-    public class Replacement_ReplaceWith : JQTest
+    public class Replacement_ReplaceWith : JSTest
     {
         public override void Run()
         {
@@ -20,7 +20,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Replacement_ReplaceWith_Object : JQTest
+    public class Replacement_ReplaceWith_Object : JSTest
     {
         public override void Run()
         {
@@ -34,4 +34,3 @@ public partial class TestsContainer
 
 
 }
-

@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 // DOM Removal - https://api.jquery.com/category/manipulation/dom-removal/
 public partial class TestsContainer
 {
-    public class Removal_Detach : JQTest
+    public class Removal_Detach : JSTest
     {
         public override void Run()
         {
@@ -21,7 +21,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Removal_Empty : JQTest
+    public class Removal_Empty : JSTest
     {
         public override void Run()
         {
@@ -32,7 +32,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Removal_Remove : JQTest
+    public class Removal_Remove : JSTest
     {
         public override void Run()
         {
@@ -44,4 +44,3 @@ public partial class TestsContainer
         }
     }
 }
-

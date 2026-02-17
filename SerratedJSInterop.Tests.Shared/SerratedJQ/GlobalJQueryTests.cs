@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJQ.Plain;
+using SerratedSharp.SerratedJQ.Plain;
 using Wasm;
 
 
@@ -8,7 +8,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
     // Tests for statis JQuery methods mapped from the global JQuery object
-    public class GlobalJQuery_Select : JQTest
+    public class GlobalJQuery_Select : JSTest
     {
         public override void Run()
         {
@@ -18,7 +18,7 @@ public partial class TestsContainer
         }
     }
 
-    public class GlobalJQuery_ParseHtml : JQTest
+    public class GlobalJQuery_ParseHtml : JSTest
     {
         public override void Run()
         {
@@ -28,4 +28,3 @@ public partial class TestsContainer
         }
     }
 }
-

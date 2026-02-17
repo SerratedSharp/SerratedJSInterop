@@ -65,6 +65,7 @@
   </Target>
 
   <ItemGroup>
+    <Folder Include="Deprecated\" />
     <Folder Include="Generated\" />
   </ItemGroup>
 

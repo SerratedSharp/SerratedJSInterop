@@ -16,7 +16,7 @@ public partial class TestsContainer
         }
     }
 
-    public class CallJS_Void_ExplicitFuncName_AppendChild : JQTest
+    public class CallJS_Void_ExplicitFuncName_AppendChild : JSTest
     {
         public override void Run()
         {
@@ -34,7 +34,7 @@ public partial class TestsContainer
         }
     }
 
-    public class CallJS_Void_CallerMemberName_AppendChild : JQTest
+    public class CallJS_Void_CallerMemberName_AppendChild : JSTest
     {
         public override void Run()
         {

@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -10,7 +10,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
 
-    public class Copying_Clone : JQTest
+    public class Copying_Clone : JSTest
     {
         public override void Run()
         {

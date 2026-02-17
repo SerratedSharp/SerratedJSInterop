@@ -33,7 +33,7 @@ public partial class TestsContainer
         }
     }
 
-    public class Setters_OnDomElement : JQTest
+    public class Setters_OnDomElement : JSTest
     {
         public override void Run()
         {

@@ -1,4 +1,4 @@
-﻿using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJSInterop;
 using SerratedSharp.SerratedJQ.Plain;
 using System;
 using Wasm;
@@ -7,7 +7,7 @@ namespace Tests.Wasm;
 public partial class TestsContainer
 {
     // Style Properties - https://api.jquery.com/category/manipulation/style-properties/
-    public class StyleProperties_Height : JQTest
+    public class StyleProperties_Height : JSTest
     {
         public override void Run()
         {
@@ -19,7 +19,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_Height_String : JQTest
+    public class StyleProperties_Height_String : JSTest
     {
         public override void Run()
         {
@@ -31,7 +31,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_Width : JQTest
+    public class StyleProperties_Width : JSTest
     {
         public override void Run()
         {
@@ -43,7 +43,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_Width_String : JQTest
+    public class StyleProperties_Width_String : JSTest
     {
         public override void Run()
         {
@@ -55,7 +55,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_InnerHeight : JQTest
+    public class StyleProperties_InnerHeight : JSTest
     {
         public override void Run()
         {
@@ -67,7 +67,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_InnerHeight_String : JQTest
+    public class StyleProperties_InnerHeight_String : JSTest
     {
         public override void Run()
         {
@@ -79,7 +79,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_InnerWidth : JQTest
+    public class StyleProperties_InnerWidth : JSTest
     {
         public override void Run()
         {
@@ -91,7 +91,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_InnerWidth_String : JQTest
+    public class StyleProperties_InnerWidth_String : JSTest
     {
         public override void Run()
         {
@@ -103,7 +103,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_OuterHeight : JQTest
+    public class StyleProperties_OuterHeight : JSTest
     {
         public override void Run()
         {
@@ -115,7 +115,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_OuterHeight_String : JQTest
+    public class StyleProperties_OuterHeight_String : JSTest
     {
         public override void Run()
         {
@@ -127,7 +127,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_OuterWidth : JQTest
+    public class StyleProperties_OuterWidth : JSTest
     {
         public override void Run()
         {
@@ -139,7 +139,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_OuterWidth_String : JQTest
+    public class StyleProperties_OuterWidth_String : JSTest
     {
         public override void Run()
         {
@@ -151,7 +151,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_ScrollLeft : JQTest
+    public class StyleProperties_ScrollLeft : JSTest
     {
         public override void Run()
         {
@@ -167,7 +167,7 @@ public partial class TestsContainer
         }
     }
 
-    public class StyleProperties_ScrollTop : JQTest
+    public class StyleProperties_ScrollTop : JSTest
     {
         public override void Run()
         {
@@ -194,8 +194,3 @@ public partial class TestsContainer
     //}
 
 }
-
-
-
-
-
