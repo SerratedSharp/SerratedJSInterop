@@ -79,8 +79,9 @@ public static class JSImportInstanceHelpers
 
     /// <summary>
     /// Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
+    /// Used by GetProperty, CallJSFunc, and SerratedJS.New&lt;J&gt; (when generic overload is used).
     /// </summary>
-    private static J CastOrWrap<J>(object? genericObject)
+    internal static J CastOrWrap<J>(object? genericObject)
     {
         Type type = typeof(J);
 
@@ -111,6 +112,20 @@ public static class JSImportInstanceHelpers
 
             // If genericObject is null or not a JSObject, return default
             return default!;
+        }
+
+        // JS interop often returns numbers as double; unboxing (int)(object)boxedDouble throws.
+        if (genericObject != null && type.IsValueType && !type.IsEnum)
+        {
+            TypeCode code = Type.GetTypeCode(type);
+            if (code >= TypeCode.SByte && code <= TypeCode.Decimal)
+            {
+                try
+                {
+                    return (J)Convert.ChangeType(genericObject, type);
+                }
+                catch (InvalidCastException) { /* fall through to direct cast */ }
+            }
         }
 
         return (J)genericObject!;

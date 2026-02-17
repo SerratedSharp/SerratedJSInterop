@@ -32,7 +32,14 @@ internal class Program
         // Do something with JQuery
         JQueryPlain.Select("#out").Append("<b>Appended</b>");
 
-        await TestOrchestrator.Begin();
+        try
+        {
+            await TestOrchestrator.Begin();
+        }
+        catch (Exception ex)
+        {
+            GlobalJS.Console.Log(ex.ToString());
+        }
 
         // Read the HTML of Body for test verification
         //string testResultsBody = JQueryPlain.Select("body").Html();

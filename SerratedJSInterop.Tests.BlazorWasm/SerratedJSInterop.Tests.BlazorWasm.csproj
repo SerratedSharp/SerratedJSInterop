@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <AssemblyName>SerratedSharp.SerratedJSInterop.Tests.BlazorWasm</AssemblyName>
+	  <RootNamespace>SerratedSharp.SerratedJSInterop.Tests.BlazorWasm</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.13" PrivateAssets="all" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SerratedJSInterop\SerratedJSInterop.csproj" />
+		<ProjectReference Include="..\SerratedDom\SerratedDom.csproj" />
+		<ProjectReference Include="..\SerratedJSInterop.Tests.Shared\SerratedJSInterop.Tests.Shared.csproj" />
+		<!-- Reference Blazor project to pull in SerratedInteropHelpers.js -->
+		<ProjectReference Include="..\SerratedJSInterop.BlazorWasm\SerratedJSInterop.BlazorWasm.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--Included transitively by SerratedJQ: <PackageReference Include="SerratedSharp.JSInteropHelpers" Version="0.1.7" />-->
+		<PackageReference Include="SerratedSharp.SerratedJQ" Version="0.1.8" />
+	</ItemGroup>
+</Project>
