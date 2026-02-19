@@ -25,25 +25,52 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
         this.jsObject = jsObject;
     }
 
-    /// <summary>Appends a child node (e.g. HTMLCanvasElement) to this element.</summary>
-    public void AppendChild(IJSObjectWrapper child)
-        => this.CallJS<object>(SerratedJS.Params(child.JSObject));
+    public string Id
+    {
+        get => this.GetProperty<string>();
+        set => this.SetProperty(value);
+    }
 
-    /// <summary>Gets or sets the raw text content of the element and its descendants.</summary>
+    public string ClassName
+    {
+        get => this.GetProperty<string>();
+        set => this.SetProperty(value);
+    }
+
+    public HtmlElement? ParentElement => this.GetProperty<HtmlElement?>();
+    public HtmlElement? FirstElementChild => this.GetProperty<HtmlElement?>();
+    public HtmlElement? LastElementChild => this.GetProperty<HtmlElement?>();
+    public int OffsetWidth => this.GetProperty<int>();
+    public int OffsetHeight => this.GetProperty<int>();
+    public int ClientWidth => this.GetProperty<int>();
+    public int ClientHeight => this.GetProperty<int>();
+
+    // CallJS with inferred function name via [CallerMemberName]
+    public void AppendChild(IJSObjectWrapper child)
+        => this.CallJS(SerratedJS.Params(child.JSObject));
+
+    // CallJS with IJSObjectWrapper<T> return, automatically wrapping the JSObject result in HtmlElement
+    public HtmlElement RemoveChild(HtmlElement child)
+        => this.CallJS<HtmlElement>("removeChild", child); 
+     
+    public void SetAttribute(string name, string value)
+        => this.CallJS("setAttribute", name, value); // CallJS with void return
+
+    public string GetAttribute(string name)
+        => this.CallJS<string>("getAttribute", name); // CallJS with string return
+
     public string TextContent
     {
         get => this.GetProperty<string>("TextContent");
         set => this.SetProperty(value, "TextContent");
     }
 
-    /// <summary>Gets or sets the HTML markup for the element's contents (DOM innerHTML).</summary>
     public string InnerHtml
     {
         get => this.GetProperty<string>("InnerHtml");
         set => this.SetProperty(value, "InnerHtml");
     }
 
-    /// <summary>Gets or sets the HTML markup for the element including the element itself (DOM outerHTML).</summary>
     public string OuterHtml
     {
         get => this.GetProperty<string>("OuterHtml");

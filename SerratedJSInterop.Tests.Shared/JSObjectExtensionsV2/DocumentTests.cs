@@ -76,4 +76,84 @@ public partial class TestsContainer
             Assert(el == null, "GetElementById should return null for missing id");
         }
     }
+
+    public class Document_DocumentElement_NotNull : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var root = doc.DocumentElement;
+            Assert(root != null, "DocumentElement should not be null");
+            var tagName = root.GetProperty<string>("tagName");
+            Assert(tagName == "HTML", "DocumentElement tagName should be HTML");
+        }
+    }
+
+    public class Document_Head_NotNull : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var head = doc.Head;
+            Assert(head != null, "Head should not be null");
+            Assert(head.JSObject != null, "Head JSObject should not be null");
+        }
+    }
+
+    public class Document_DocumentURI_NonEmpty : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var uri = doc.DocumentURI;
+            Assert(uri != null, "DocumentURI should not be null");
+            Assert(uri.Length > 0, "DocumentURI should be non-empty");
+        }
+    }
+
+    public class Document_CharacterSet_NonEmpty : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var cs = doc.CharacterSet;
+            Assert(cs != null, "CharacterSet should not be null");
+            Assert(cs.Length > 0, "CharacterSet should be non-empty");
+        }
+    }
+
+    public class Document_QuerySelector_ById : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            tc.Append("<div id='qsel-target'>qsel-content</div>");
+            var doc = Document.GetDocument();
+            var el = doc.QuerySelector("#qsel-target");
+            Assert(el != null, "QuerySelector should return non-null for existing selector");
+            Assert(el!.TextContent == "qsel-content", "QuerySelector element TextContent should match");
+        }
+    }
+
+    public class Document_QuerySelector_Missing : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var el = doc.QuerySelector("#nonexistent-xyz-123");
+            Assert(el == null, "QuerySelector should return null for missing selector");
+        }
+    }
+
+    public class Document_CreateElement_ExplicitFuncName : JSTest
+    {
+        public override void Run()
+        {
+            var doc = Document.GetDocument();
+            var div = doc.CallJS<HtmlElement>("createElement", "div");
+            Assert(div != null, "createElement via CallJS(string, params object[]) should return non-null");
+            var tagName = div.GetProperty<string>("tagName");
+            Assert(tagName == "DIV", "Created element tagName should be DIV");
+        }
+    }
 }
