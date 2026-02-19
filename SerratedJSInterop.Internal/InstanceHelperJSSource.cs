@@ -31,6 +31,10 @@ namespace SerratedSharp.SerratedJSInterop
 
         [AgnosticJSImport("FuncByNameToObject")]
         public static partial double[] FuncByNameAsDoubleArray(JSObject jqObject, string funcName, [AgnosticJSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
+
+        [AgnosticJSImport("FuncByNameToObject")]
+        [return: AgnosticJSMarshalAs<JSType.Discard>]
+        public static partial void FuncByNameVoid(JSObject jqObject, string funcName, [AgnosticJSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
     }
 
     // Stub implementations so this project compiles; this assembly is only used for code generation.
@@ -42,5 +46,6 @@ namespace SerratedSharp.SerratedJSInterop
         public static partial object[] FuncByNameAsArray(JSObject jqObject, string funcName, object[] parameters) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial string[] FuncByNameAsStringArray(JSObject jqObject, string funcName, object[] parameters) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial double[] FuncByNameAsDoubleArray(JSObject jqObject, string funcName, object[] parameters) => throw new NotSupportedException("This assembly is for code generation only.");
+        public static partial void FuncByNameVoid(JSObject jqObject, string funcName, object[] parameters) => throw new NotSupportedException("This assembly is for code generation only.");
     }
 }

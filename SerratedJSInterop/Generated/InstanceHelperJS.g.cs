@@ -52,6 +52,14 @@ namespace SerratedSharp.SerratedJSInterop
                 return InstanceHelperJSProxyForDotNet.FuncByNameAsDoubleArray(jqObject, funcName, parameters);
         }
 
+        public static void FuncByNameVoid(JSObject jqObject, string funcName, object[] parameters)
+        {
+            if (AgnosticRuntime.IsUnoWasmBootstrapLoaded)
+                InstanceHelperJSProxyForUno.FuncByNameVoid(jqObject, funcName, parameters);
+            else
+                InstanceHelperJSProxyForDotNet.FuncByNameVoid(jqObject, funcName, parameters);
+        }
+
     }
 }
 
@@ -84,6 +92,10 @@ namespace SerratedSharp.SerratedJSInterop
         [JSImport(baseJSNamespace + ".FuncByNameToObject", moduleName)]
         public static partial double[] FuncByNameAsDoubleArray(JSObject jqObject, string funcName, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
 
+        [JSImport(baseJSNamespace + ".FuncByNameToObject", moduleName)]
+        [return: JSMarshalAs<JSType.Discard>]
+        public static partial void FuncByNameVoid(JSObject jqObject, string funcName, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
+
     }
 
     public static partial class InstanceHelperJSProxyForUno
@@ -112,6 +124,10 @@ namespace SerratedSharp.SerratedJSInterop
 
         [JSImport(baseJSNamespace + ".FuncByNameToObject", moduleName)]
         public static partial double[] FuncByNameAsDoubleArray(JSObject jqObject, string funcName, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
+
+        [JSImport(baseJSNamespace + ".FuncByNameToObject", moduleName)]
+        [return: JSMarshalAs<JSType.Discard>]
+        public static partial void FuncByNameVoid(JSObject jqObject, string funcName, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] parameters);
 
     }
 }

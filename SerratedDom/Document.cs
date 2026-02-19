@@ -11,7 +11,6 @@ namespace SerratedSharp.SerratedDom;
 [SupportedOSPlatform("browser")]
 public class Document:IJSObjectWrapper
 {
-
     public static Document GetDocument() => new Document();
     static readonly Lazy<JSObject> _document = new(() => JSHost.GlobalThis.GetProperty<JSObject>("document"));
     public JSObject JSObject => _document.Value;
@@ -23,5 +22,4 @@ public class Document:IJSObjectWrapper
     
     public HtmlElement GetElementById(string id)
         => this.CallJS<HtmlElement>(SerratedJS.Params(id));
-
 }

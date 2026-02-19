@@ -7,16 +7,33 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-
+    /// <summary>
+    /// Helper so that JSObject.CallJS(JSParams, [CallerMemberName]) is invoked with funcName = "AppendChild" (→ "appendChild" in JS).
+    /// </summary>
     private static class VoidCallJSHelper
     {
         public static void AppendChild(JSObject parent, JSObject child)
         {
+            //parent.CallJS< .CallJS<JSObject>(
+
             parent.CallJS(SerratedJS.Params(child));
         }
     }
 
-    public class CallJS_Void_ExplicitFuncName_AppendChild : JSTest
+    public class CallJS_JSObject_Returning_ExplicitFuncName_ParamsArray : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            var doc = Document.GetDocument();
+            var span = doc.JSObject.CallJS<JSObject>("createElement", "span");
+            Assert(span != null, "createElement via JSObject.CallJS<JSObject>(string, params object[]) should return non-null");
+            var tagName = span.GetProperty<string>("tagName");
+            Assert(tagName == "SPAN", "Created element tagName should be SPAN");
+        }
+    }
+
+    public class CallJS_JSObject_Void_ExplicitFuncName_JSParams : JSTest
     {
         public override void Run()
         {
@@ -34,7 +51,7 @@ public partial class TestsContainer
         }
     }
 
-    public class CallJS_Void_CallerMemberName_AppendChild : JSTest
+    public class CallJS_JSObject_Void_CallerMemberName_AppendChild : JSTest
     {
         public override void Run()
         {
@@ -48,6 +65,23 @@ public partial class TestsContainer
 
             var found = doc.GetElementById("void-calljs-callername-id");
             Assert(found != null, "appendChild via void CallJS(JSParams, CallerMemberName) should have appended the node");
+        }
+    }
+
+    public class CallJS_JSObject_Void_ExplicitFuncName_ParamsArray : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            var doc = Document.GetDocument();
+            var body = doc.Body.JSObject;
+            var div = doc.CreateElement("div").JSObject;
+            JSImportInstanceHelpers.SetProperty(div, "id", "calljs-jsobject-void-params-id");
+
+            body.CallJS("appendChild", div);
+
+            var found = doc.GetElementById("calljs-jsobject-void-params-id");
+            Assert(found != null, "appendChild via JSObject.CallJS(string, params object[]) should have appended the node");
         }
     }
 }
