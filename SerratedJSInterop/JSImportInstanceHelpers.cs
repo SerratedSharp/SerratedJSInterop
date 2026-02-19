@@ -49,6 +49,12 @@ internal static class JSImportInstanceHelpers
         return CastOrWrap<J>(genericObject);
     }
 
+    public static void CallJSFuncVoid(JSObject jsObject, string funcName, params object[] parameters)
+    {
+        object[] objs = UnwrapJSObjectParams(parameters);
+        InstanceHelperJS.FuncByNameVoid(jsObject, ToJSCasing(funcName), objs);
+    }
+
     // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
     internal static J CastOrWrap<J>(object? genericObject)
     {

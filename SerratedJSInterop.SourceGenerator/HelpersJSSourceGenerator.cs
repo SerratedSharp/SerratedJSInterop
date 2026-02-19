@@ -169,11 +169,15 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
             sb.AppendLine("            if (AgnosticRuntime.IsUnoWasmBootstrapLoaded)");
             if (m.ReturnTypeIsTask)
                 sb.AppendLine($"                await {proxyPrefix}{proxyForUnoName}.{m.MethodName}({m.ArgumentList});");
+            else if (m.ReturnType == "void")
+                sb.AppendLine($"                {proxyPrefix}{proxyForUnoName}.{m.MethodName}({m.ArgumentList});");
             else
                 sb.AppendLine($"                return {proxyPrefix}{proxyForUnoName}.{m.MethodName}({m.ArgumentList});");
             sb.AppendLine("            else");
             if (m.ReturnTypeIsTask)
                 sb.AppendLine($"                await {proxyPrefix}{proxyForDotNetName}.{m.MethodName}({m.ArgumentList});");
+            else if (m.ReturnType == "void")
+                sb.AppendLine($"                {proxyPrefix}{proxyForDotNetName}.{m.MethodName}({m.ArgumentList});");
             else
                 sb.AppendLine($"                return {proxyPrefix}{proxyForDotNetName}.{m.MethodName}({m.ArgumentList});");
             sb.AppendLine("        }");
@@ -380,6 +384,7 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
         {
             "object" => "[return: JSMarshalAs<JSType.Any>]",
             "object[]" => "[return: JSMarshalAs<JSType.Array<JSType.Any>>]",
+            "void" => "[return: JSMarshalAs<JSType.Discard>]",
             _ => null
         };
     }
