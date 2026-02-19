@@ -54,6 +54,10 @@ public class Image : HtmlElement, IJSObjectWrapper<Image>
     public int NaturalWidth => this.GetProperty<int>();
     public int NaturalHeight => this.GetProperty<int>();
     public bool Complete => this.GetProperty<bool>();
-
- 
+    public string CurrentSrc => this.GetProperty<string>();
+    public string CrossOrigin
+    {
+        get => this.GetProperty<string>();
+        set => this.SetProperty(value);
+    }
 }

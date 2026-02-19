@@ -86,4 +86,26 @@ public partial class TestsContainer
                 Assert(true, "1x1 PNG loaded and dimensions correct");
         }
     }
+
+    public class Image_CurrentSrc_ReadOnly : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.Src = OnePixelPngDataUrl;
+            var currentSrc = img.CurrentSrc;
+            Assert(currentSrc != null, "CurrentSrc should not be null after setting Src");
+            Assert(currentSrc.Length > 0 || !img.Complete, "CurrentSrc should be non-empty when loaded, or image may not be complete yet");
+        }
+    }
+
+    public class Image_CrossOrigin_GetSet : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.CrossOrigin = "anonymous";
+            Assert(img.CrossOrigin == "anonymous", "CrossOrigin should round-trip");
+        }
+    }
 }
