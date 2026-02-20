@@ -70,16 +70,18 @@ public static class SerratedJS
         return HelpersJS.ObjectNew(typePath, unwrapped);
     }
 
-    // CONSIDER: Whether we need this overload.  If there is a wrapper type J, then it should probably just implement `JSObject = SerratedJS.New("type")`.  The only time an auto-wrapping New makes sense is if the wrapper didn't implement JS interop constructor, and instead relied on factory.  Even then we can just called the constructor taking JSObject.
-    //public static J New<J>(string typePath, JSParams parameters = default) where J : IJSObjectWrapper<J>
-    //{
-    //    var jsObject = New(typePath, parameters);
-    //    return JSImportInstanceHelpers.CastOrWrap<J>(jsObject);
-    //}
+    /// <summary>
+    /// Calls JS constructor for `typePath` constructor name and namespace if required.  E.g. "PIXI.Rectangle", "Image". Returns <see cref="JSObject"/>.
+    /// </summary>
+    /// <param name="typePath">JS constructor name. Include fully qualified path if necessary (e.g. "PIXI.Rectangle", "Image").  Is case sensitive.</param>
+    /// <param name="parameters">Optional constructor arguments (e.g. SerratedJS.New("Rectangle", "green", 50, 100)).</param>
+    /// <returns>JSObject reference to the new object.</returns>
+    public static JSObject New(string typePath, params object[] parameters)
+    {
+        return New(typePath, Params(parameters));
+    }
 
-    
-
-
+    // CONSIDER: Overloads for string[] and other array types to avoid unintentional expansion when passing arrays as constructor arguments.
 
 }
 
