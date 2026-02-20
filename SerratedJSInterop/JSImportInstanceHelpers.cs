@@ -108,6 +108,9 @@ internal static class JSImportInstanceHelpers
 
     public static object[] UnwrapJSObjectParams(object[] parameters)
     {
+        if(parameters == null)
+            return Array.Empty<object>();
+
         object[]? objs = null;
         for (int i = 0; i < parameters.Length; i++)
         {

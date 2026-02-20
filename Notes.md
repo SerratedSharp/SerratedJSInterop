@@ -17,7 +17,7 @@ Add the `nugetpackout` folder as a NuGet package source in VS (or other solution
 
 Missing WebAssembly in indivdual installer:
 
-WasmBrowser projects require the "WebASsembly Build Tools" from Visual Studio Installer Individual Components.
+WasmBrowser projects require the "WebAssembly Build Tools" from Visual Studio Installer Individual Components.
 Also requires the wasm-experimental workload to be installed.
 Sometimes these need to be reinstalled after a Visual Studio update.
 

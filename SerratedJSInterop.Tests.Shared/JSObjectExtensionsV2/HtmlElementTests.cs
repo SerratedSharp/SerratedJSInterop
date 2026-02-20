@@ -144,4 +144,19 @@ public partial class TestsContainer
             Assert(value == "bar", "GetAttribute should return value set by SetAttribute");
         }
     }
+
+    /// <summary>HasChildNodes() uses CallJS&lt;bool&gt;() with no parameters (inferred name).</summary>
+    public class HtmlElement_HasChildNodes_NoArgCallJS : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            var doc = Document.GetDocument();
+            var container = doc.CreateElement("div");
+            Assert(!container.HasChildNodes(), "Empty element should report no child nodes");
+            var child = doc.CreateElement("span");
+            container.AppendChild(child);
+            Assert(container.HasChildNodes(), "Element with appended child should report has child nodes");
+        }
+    }
 }

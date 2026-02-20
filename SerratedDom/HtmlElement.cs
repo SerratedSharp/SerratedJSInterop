@@ -4,6 +4,11 @@ using SerratedSharp.SerratedJSInterop;
 
 namespace SerratedSharp.SerratedDom;
 
+// Alternatively we could inherit from Node like so:
+// public class HtmlElement : Node, IJSObjectWrapper<HtmlElement>
+// {
+//     public HtmlElement(JSObject jsObject) : base(jsObject) { }
+
 /// <summary>
 /// Wraps a DOM HTMLElement for use with Serrated JS interop.
 /// </summary>
@@ -40,6 +45,9 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
     public HtmlElement? ParentElement => this.GetProperty<HtmlElement?>();
     public HtmlElement? FirstElementChild => this.GetProperty<HtmlElement?>();
     public HtmlElement? LastElementChild => this.GetProperty<HtmlElement?>();
+
+    /// <summary>Returns whether this element has any child nodes. No parameters; demonstrates CallJS&lt;J&gt;() with inferred name.</summary>
+    public bool HasChildNodes() => this.CallJS<bool>();
     public int OffsetWidth => this.GetProperty<int>();
     public int OffsetHeight => this.GetProperty<int>();
     public int ClientWidth => this.GetProperty<int>();
@@ -51,7 +59,11 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
 
     // CallJS with IJSObjectWrapper<T> return, automatically wrapping the JSObject result in HtmlElement
     public HtmlElement RemoveChild(HtmlElement child)
-        => this.CallJS<HtmlElement>("removeChild", child); 
+        => this.CallJS<HtmlElement>("removeChild", child);
+
+    /// <summary>Inserts newChild before referenceChild (multiple params via SerratedJS.Params). Pass null as referenceChild to insert at end.</summary>
+    public HtmlElement InsertBefore(HtmlElement newChild, HtmlElement? referenceChild)
+        => this.CallJS<HtmlElement>("insertBefore", SerratedJS.Params(newChild.JSObject, referenceChild?.JSObject));
      
     public void SetAttribute(string name, string value)
         => this.CallJS("setAttribute", name, value); // CallJS with void return
@@ -76,4 +88,7 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
         get => this.GetProperty<string>("OuterHtml");
         set => this.SetProperty(value, "OuterHtml");
     }
+
+    /// <summary>Returns a DOMTokenList wrapper around this element's classList (does not implement IJSObjectWrapper).</summary>
+    public DomTokenList ClassList => new DomTokenList(this.GetProperty<JSObject>());
 }
