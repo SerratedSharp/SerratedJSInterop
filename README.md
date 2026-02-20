@@ -91,7 +91,7 @@ There are two main ways to use SerratedJSInterop: wrapping a JS type with C# cla
 
 - Implement `IJSObjectWrapper<YourType>` and expose a `JSObject`. 
 - Implement the required static WrapInstance method, which is leveraged by the library to automatically wrap returned instances for calls such as `CallJS<YourType>()`.
-- Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", SerratedJS.Params(...))` with arguments. 
+- Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments. 
 - Use `this.GetProperty<T>()`, `this.SetProperty(value)`, and `this.CallJS<T>(SerratedJS.Params(...))` to map properties/methods to the underlying JSObject reference.
 
 ```csharp
@@ -112,6 +112,13 @@ public class Image : IJSObjectWrapper<Image>
     public bool Complete => this.GetProperty<bool>();
 }
 ```
+
+### `IJSObjectWrapper<T>`
+
+As shown in later examples, `IJSObjectWrapper<T>` isn't strictly required.  However when implemented, `IJSObjectWrapper<T>` provides the framework the means to automatically wrap a JSObject reference with your C# wrapper type by calling its `.WrapInstance()`.  This allows calls to `.GetProperty<J>()` and `.CallJS<J>()` to specify your wrapper `J` as the return type.  These internally calls your implementation of .WrapInstance() to instantiate `J` from a `JSObject`.  
+
+> [!NOTE] 
+> There's no strict type checking of the JS type, and runtime errors will occur later in the object's lifecycle when interacting with an incorrectly mapped type.  E.g. calling `GetProperty<HtmlElement>("firstNode")` where the JS API might return a `Node` type rather than strictly `HtmlElement`.  Later attempts to access non-existant members on the incorrectly wrapped type likely fail with confusing errors. It's expected that the implementer uses knowledge of the JS APIs they're wrapping to map types appropriately.
 
 ### Inferred Member Names
 
@@ -228,9 +235,9 @@ Some JS API's may require data be passed in an object structure such as an `opti
 
 ```csharp
 var evt = SerratedJS.New("CustomEvent", 
-  SerratedJS.Params("myevent", 
+    "myevent", 
     new { detail = 42 }.MarshalAsJson() // 2nd param pass via JSON
-    ));
+  );
 
 element.SetProperty(
     new { is = "my-element" }.MarshalAsJson(), "options");
