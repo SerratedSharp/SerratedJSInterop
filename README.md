@@ -1,6 +1,6 @@
 # SerratedJSInterop
 
-A class library to simplify creating .NET WebAssembly wrappers on JavaScript instances when using `System.Runtime.InteropServices.JavaScript` and [JSImport]. It reduces or eliminates the need for explicit JavaScript shims and per-method [JSImport] declarations, so you can map C# types to JS instances with minimal boilerplate. This project is a migration and formalization of SerratedSharp.JSInteropHelpers for broader use.
+A library to simplify .NET WebAssembly interop with JavaScript when using `System.Runtime.InteropServices.JavaScript` and [JSImport]. It reduces or eliminates the need for explicit JavaScript shims and per-method [JSImport] declarations. This eases adhoc JS interop and reduces boilerplate code for C# wrappers.
 
 > **Work in progress:** The API is being refined and will be published to NuGet when ready.
 
@@ -38,6 +38,24 @@ public class Audio : IJSObjectWrapper<Audio>
         
     static Audio IJSObjectWrapper<Audio>.WrapInstance(JSObject jsObject) => new Audio(jsObject);
 }
+```
+
+Alternatively, adhoc interop without wrapper is possible on InteropServices JSObject:
+
+```csharp
+var spanJSO = documentJS.CallJS<JSObject>("createElement", "span");
+```
+
+Both approaches can be mixed, with wrappers being returned from adhoc interop as needed.  This allows you to tailor the granularity and scope of type wrappers to your liking, seemlessly switching between working with JSObject and custom wrappers as desired.  It also allows easy access to native .NET interop methods without cumbersome inheritance hierarchies.  Each line of the following represents an interop operation, either through a wrapped interop member or directly through JSObject.
+
+```csharp
+HtmlElementWrapper span = documentWrapper.CreateElement("span");
+int offsetWidth = span.OffsetWidth;
+var spanJSObject = span.JSObject;
+spanJSObject.SetProperty("textContent", "Hello world");
+// Request return be wrapped with custom DomTokenListWrapper
+DomTokenListWrapper classesList = spanJSObject.GetProperty<DomTokenListWrapper>("classList");
+bool hasClass = classesList.Contains("my-class");// custom wrapper member
 ```
 
 ## Prerequisites
@@ -294,3 +312,6 @@ This ensures no potential for XSS to occur where a user supplied string could in
 ## Release Notes
 
 _(Release notes will be added here when the library is published to NuGet.)_
+
+
+This project is a migration of SerratedSharp.JSInteropHelpers previously used internally for other projects, with SerratedJSInterop formalized for broader use.
