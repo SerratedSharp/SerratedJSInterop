@@ -4,33 +4,53 @@ A class library to simplify creating .NET WebAssembly wrappers on JavaScript ins
 
 > **Work in progress:** The API is being refined and will be published to NuGet when ready.
 
+## Brief Example
+
+This example demonstrates wrapping a JS type which performs interop for methods and properties.  This allows the creation of clean wrappers for JS types/libraries with minimal effort: 
+
+```csharp
+public class Audio : IJSObjectWrapper<Audio>
+{    
+    public JSObject JSObject { get; }
+
+    public Audio() {
+         JSObject = SerratedJS.New(nameof(Audio)); // interop to JS New constructor
+    }
+    
+    public Audio(JSObject jsObject) {
+        JSObject = jsObject;
+    }
+
+    public string Src
+    {
+        get => this.GetProperty<string>();
+        set => this.SetProperty(value);
+    }
+
+    public double Duration => this.GetProperty<double>();
+    public bool IsPaused => this.GetProperty<bool>("paused");        
+    // Returns automatically wrapped by types implementing IJSOjbectWrapper<J>
+    public DomTokenList ControlsList => this.GetProperty<DomTokenList>();
+    public void AddTextTrack(string kind, string label, string language)
+        => this.CallJS("addTextTrack", kind, label, language);
+    public void CanPlayType(string type) => this.CallJS(type);
+    public JSObject CaptureStream() => this.CallJS<JSObject>();
+        
+    static Audio IJSObjectWrapper<Audio>.WrapInstance(JSObject jsObject) => new Audio(jsObject);
+}
+```
+
 ## Prerequisites
 
 - .NET 9 or later (or the target framework supported by the platform package you use).
-- A project that compiles to WebAssembly: e.g. .NET WebAssembly Browser App (wasmbrowser), Standalone Blazor WebAssembly, or Uno Platform WASM.
-- `System.Runtime.InteropServices.JavaScript` is used for interop.  
-  - This differs from the typical Blazor IJSRuntime, but can operate side-by-side within Blazor WASM.
 
-## Brief Example
+- A project that compiles to WebAssembly: 
+  - A WebAssembly Browser App project created according to [JavaScript `[JSImport]`/`[JSExport]` interop with a WebAssembly Browser App project](https://learn.microsoft.com/en-us/aspnet/core/client-side/dotnet-interop/wasm-browser-app?view=aspnetcore-8.0).
+  - A Blazor client-side project created according to [JavaScript JSImport/JSExport interop with ASP.NET Core Blazor](https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/import-export-interop?view=aspnetcore-8.0).
+    - Note: `System.Runtime.InteropServices.JavaScript` is used for SerratedJSInterop.  This differs from the typical Blazor IJSRuntime, but can operate side-by-side within Blazor WASM.
+  - A WASM framework/platform that supports [JSImport]/[JSExport] interop (System.Runtime.InteropServices.JavaScript), such as Uno Platform WASM.  
+    - (Note: As of the newest migration, validation of compatibility with Uno has not been completed.  Anyone willing to do so please see: [Issue #33](https://github.com/SerratedSharp/SerratedJSInterop/issues/33))
 
-This example demonstrates wrapping a JS type which performs interop for methods and properties.
-
-```csharp
-public class Image : IJSObjectWrapper<Image>
-{
-    static Image IJSObjectWrapper<Image>.WrapInstance(JSObject jsObject) => new Image(jsObject);
-    public JSObject JSObject => jsObject;
-    private JSObject jsObject;
-
-    public Image() { jsObject = SerratedJS.New(nameof(Image)); }
-    public Image(JSObject jsObject) { this.jsObject = jsObject; }
-
-    public string Src { get => this.GetProperty<string>(); set => this.SetProperty(value); }
-    public int Width { get => this.GetProperty<int>(); set => this.SetProperty(value); }
-    public int Height { get => this.GetProperty<int>(); set => this.SetProperty(value); }
-    public bool Complete => this.GetProperty<bool>();
-}
-```
 
 ## Quick Start
 
@@ -40,30 +60,39 @@ You typically reference a **platform-specific package** through NuGet that depen
 - **SerratedSharp.SerratedJSInterop.WasmBrowser** — .NET WebAssembly Browser Apps (i.e. wasm-experimental workload).
 - **SerratedSharp.SerratedJSInterop.Uno** — Uno Platform projects targeting WebAssembly.
 
-These packages provide the required initialization (e.g. loading the JS shim). Additionally, the Blazor package includes utilities for marshalling `IJSRuntime` JSObjects to/from `System.Runtime.InteropServices.JavaScript.JSObject`.
+1) Add a reference to one of the above platform-specific packages via NuGet.
+2) Add the following call to Program.Main() to load the JS module:
 
-TODO: Explicit steps for adding nuget package and initialization code for loading JS: https://github.com/SerratedSharp/SerratedJQ/blob/main/SerratedJQLibrary/JSInteropHelpers/readme.md#net-8-wasmbrowser-projects
+```csharp
+await SerratedJSInteropModule.ImportAsync();
+```
 
-### Minimal setup (WasmBrowser)
+This assumes your app is rooted at the domain.  If your site is hosted at a subpath such as `example.com/myapp/`, you will need to specify the base URL for the JS module:
 
-- Create a WebAssembly Browser App and add the appropriate SerratedJSInterop platform package.
-- Ensure the module is imported at startup (the platform package usually handles this).
-- Use `SerratedJS.New`, `GetProperty`/`SetProperty`, and `CallJS` from your wrapper types as in the Example above.
+```csharp
+await SerratedJSInteropModule.ImportAsync("/myapp");
+```
 
-### Minimal setup (Blazor / Uno)
+In some cases the context of the WASM runtime loader is initialized from a subpath of the site, and would require the following:
+```csharp
+await SerratedJSInteropModule.ImportAsync("..");
+```
 
-- Add the corresponding SerratedJSInterop platform package (Blazor or Uno).
-- Follow the package’s readme for any one-time initialization (e.g. script loading or service registration).
+The NuGet package leverages RCL format for bundling static JS assets, and this method will load the module from `/_content/SerratedSharp.SerratedJSInterop/SerratedJSInteropShim.js`.
 
 ## Usage
 
-There are two main ways to use SerratedJSInterop: **wrapping a JS type** in a C# type that implements `IJSObjectWrapper<T>`, or **calling JS on raw `JSObject` references** without a dedicated wrapper. In both cases you avoid hand-written [JSImport] and shims for each member.
+There are two main ways to use SerratedJSInterop: wrapping a JS type with C# class implementing `IJSObjectWrapper<T>` or calling extensions on `JSObject` references. In both cases, you avoid implementing boilerplate code for [JSImport] declarations and JavaScript shims.
 
-**Note:** `System.Runtime.InteropServices.JavaScript.JSObject` here is not the same as `Microsoft.JSInterop.IJSObjectReference` / Blazor’s JSObject. The platform packages may provide helpers to convert between them when needed.
+> [!NOTE] 
+> This library leverages newer `System.Runtime.InteropServices.JavaScript` for interop, which differs from the typical Blazor `IJSRuntime`.  Both can operate side-by-side within a Blazor WASM project, and this library provides utilities for marshalling between the distinct `JSObject` types.
 
-### Instance wrapper
+### Instance Wrapper
 
-Implement `IJSObjectWrapper<YourType>` and expose a `JSObject`. Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", SerratedJS.Params(...))` with arguments. Use `this.GetProperty<T>()`, `this.SetProperty(value)`, and `this.CallJS<T>(SerratedJS.Params(...))` so the framework infers the JS member name from the C# member name.
+- Implement `IJSObjectWrapper<YourType>` and expose a `JSObject`. 
+- Implement the required static WrapInstance method, which is leveraged by the library to automatically wrap returned instances for calls such as `CallJS<YourType>()`.
+- Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", SerratedJS.Params(...))` with arguments. 
+- Use `this.GetProperty<T>()`, `this.SetProperty(value)`, and `this.CallJS<T>(SerratedJS.Params(...))` to map properties/methods to the underlying JSObject reference.
 
 ```csharp
 public class Image : IJSObjectWrapper<Image>
@@ -84,28 +113,114 @@ public class Image : IJSObjectWrapper<Image>
 }
 ```
 
-You can also call methods with an explicit name: `this.CallJS<HtmlElement>("createElement", "div")` or `this.CallJS("setAttribute", name, value)` for void methods.
-
 ### Inferred Member Names
 
-Extension methods such as `GetProperty<T>()`, `SetProperty(value)`, and `CallJS<T>(SerratedJS.Params(...))` have overloads which use the calling C# member name to infer the JS property or method name via [CallerMemberName].  Additional overloads allow the function/property names to be specified explicitly as needed. 
+Extension methods such as `GetProperty<T>()`, `SetProperty(value)`, and `CallJS<T>(SerratedJS.Params(...))` have overloads which use the calling C# member name to infer the JS property or method name via [CallerMemberName].  Additional overloads allow the function/property names to be specified explicitly as needed.
 
-TODO: Examples of inferred and explicit names for properties and methods.
+The first letter is lowercased for consistency with common JS lowerCamelCase conventions.  (Note: This lower casing convention is not applied for the SerratedJSNew() interop operator.)
 
+```csharp
+// Property getter "Body" infers JS property "body"
+public HtmlElement Body => this.GetProperty<HtmlElement>();
+
+// Inferred name and passing parameters via JSParams
+public HtmlElement CreateElement(string tagName) 
+  => this.CallJS<HtmlElement>(SerratedJS.Params(tagName));
+
+public string Id { 
+  get => this.GetProperty<string>(); 
+  set => this.SetProperty(value); 
+}
+
+public void AppendChild(IJSObjectWrapper child) 
+  => this.CallJS(SerratedJS.Params(child.JSObject));
+```
+
+**Explicit names:** JS names can be specified explicitely isntead of being inferred:
+
+```csharp
+public HtmlElement Head => this.GetProperty<HtmlElement>("head");
+
+public HtmlElement? QuerySelector(string selector)
+  => this.CallJS<HtmlElement?>("querySelector", selector);
+
+public string TextContent { 
+  get => this.GetProperty<string>("TextContent"); 
+  set => this.SetProperty(value, "TextContent"); 
+}
+
+public void SetAttribute(string name, string value) 
+  => this.CallJS("setAttribute", name, value);
+```
+
+> [!NOTE] 
+> **Pitfall:** When specifying explicit property name for SetProperty, then the value comes first with the property name second.  Consider using explicit parameter names to avoid confusion: `this.SetProperty(propertyName: "TextContent", value)`.
 
 ### Operating on JSObject
 
-Wrappers are not required.  Extension methods are available for System.Runtime.InteropServices.JavaScript.JSObject can be used directly for ad-hoc interop without defining a wrapper type.  Use `JSObject.GetProperty<T>()`, `JSObject.SetProperty(value)`, and `JSObject.CallJS<T>(SerratedJS.Params(...))` to interact with the JS instance.  The same inferred member name overloads are available on JSObject as well.
+IJSObjectWrapper is not required. Extension methods are also defined on `System.Runtime.InteropServices.JavaScript.JSObject`. 
 
-TODO: Example of New and operations on JSObject.  Also show a non-IJSObjectWrapper that has a JSObject instance but still infers member names.
+These can be used for adhoc interop:
+```csharp
+var doc = Document.GetDocument();
+var spanJSObject = doc.JSObject.CallJS<JSObject>("createElement", "span");
+var tagName = spanJSObject.GetProperty<string>("tagName");
+doc.Body.JSObject.CallJS("appendChild", spanJSObject);
+```
+
+This is also useful for navigating through children where implementing a full wrapper isn't desired:
+
+```
+public class Document
+{
+    ...
+    public int BodyOffsetWidth 
+      => this.JSObject.GetProperty<JSObject>("body").GetProperty<int>("offsetWidth");
+```
+
+These can be used for an alternative approach to wrapping types without IJSObjectWrapper: 
+
+```csharp
+public sealed class DomTokenList
+{
+    private readonly JSObject _js;
+    public DomTokenList(JSObject jsObject) { _js = jsObject; }
+
+    public int Length => _js.GetProperty<int>();
+    public string Item(int index) => _js.CallJS<string>(SerratedJS.Params(index));
+    public bool Contains(string token) => _js.CallJS<bool>("contains", SerratedJS.Params(token));
+    public void Add(string token) => _js.CallJS(SerratedJS.Params(token));
+    public void Remove(string token) => _js.CallJS("remove", SerratedJS.Params(token));
+}
+```
 
 ### Passing Parameters
 
-Leveraging both `[CallerMemberName]` and `params` in the same method overload presents challenges.  To overcome these, SerratedJSInterop requires a `SerratedJS.Params(...)` helper when using overloads that infer member names from caller.  
+Leveraging both `[CallerMemberName]` and `params` in the same method overload presents challenges. To overcome these, SerratedJSInterop requires a `SerratedJS.Params(...)` helper when using `CallJS` overloads that infer the member name from the caller.  This allows a variable number of parameters while also supporting `[CallerMemberName]`.
 
-This is not required when using extension method overloads where the member name is passed explicitely.
+SerratedJS.Params can handle a mix of primitives/literals(assuming supported by interop), InteropServices JSObject, and IJSObjectWrapper, such as `SerratedJS.Params("div", jsObject, wrapper, 5)`.
 
-TODO: Example of both approaches.
+This is required when passing parameters with an inferred caller name:
+
+```csharp
+public HtmlElement CreateElement(string tagName)
+    => this.CallJS<HtmlElement>(SerratedJS.Params(tagName));
+
+public void AppendChild(IJSObjectWrapper child)
+    => this.CallJS(SerratedJS.Params(child.JSObject));
+
+public HtmlElement InsertBefore(HtmlElement newChild, HtmlElement? referenceChild)
+    => this.CallJS<HtmlElement>("insertBefore", SerratedJS.Params(newChild.JSObject, referenceChild?.JSObject));
+```
+
+When function names are specified explicitly, then SerratedJS.Params can be optionally ommitted:
+
+```csharp
+var el = doc.CallJS<HtmlElement?>("querySelector", ".container");
+element.CallJS("setAttribute", "data-foo", "bar");
+body.CallJS("appendChild", div);
+parent.CallJS<HtmlElement>("insertBefore", child1, child2);
+```
 
 ### Passing POCO/POJO/Literal-Only Objects
 
@@ -140,7 +255,7 @@ public class Document : IJSObjectWrapper
 }
 ```
 
-### Static / global wrapper
+### Static/Global Wrapper
 
 An example of a pure static wrapper.
 
@@ -159,9 +274,9 @@ public static class GlobalJS
 
 ## Additional Examples
 
-- SerratedDom - TODO: Link to SerratedDom folder
-- SerratedJQ - TODO: Link once migrated to new library
-- Unit Tests - TODO: Link to unit tests, but note that these n some cases leverage internal methods for test setup. 
+- **SerratedDom** — DOM/HTML wrappers (Document, HtmlElement, Image, DomTokenList, Location) that use SerratedJSInterop. See the [SerratedDom](SerratedDom/) folder and [SerratedDom/readme.md](SerratedDom/readme.md). Types like `Document` and `HtmlElement` implement `IJSObjectWrapper`; `DomTokenList` and `Location` use a private `JSObject` with **JSObjectExtensionsV2** only.
+- **SerratedJQ** — TODO: Link once migrated to new library.
+- **Unit tests** — The [SerratedJSInterop.Tests.Shared](SerratedJSInterop.Tests.Shared/) project contains tests that exercise the extensions (e.g. `JSObjectExtensionsV2/DocumentTests.cs`, `HtmlElementTests.cs`, `DomTokenListTests.cs`, `LocationTests.cs`). Some tests use internal or test-only setup; treat them as usage examples rather than a stable public API. 
 
 ## Security Considerations
 
