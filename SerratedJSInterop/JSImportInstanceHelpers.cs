@@ -37,6 +37,11 @@ internal static class JSImportInstanceHelpers
                 case Type t when t == typeof(double):
                     genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, ToJSCasing(funcName), objs);
                     return (J)genericObject;
+                    
+                case Type t when t == typeof(JSObject): // JSObject[] array
+                    genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, ToJSCasing(funcName), objs);
+                    var array = (object[])genericObject;
+                    return (J)(object)(array.Cast<JSObject>().ToArray());
                 default:
                     throw new NotImplementedException($"CallJSFunc: Returning array of {type.GetElementType()} not implemented");
             }
@@ -111,16 +116,23 @@ internal static class JSImportInstanceHelpers
         if(parameters == null)
             return Array.Empty<object>();
 
+        // New param array with unwrapped JSOBjects if wrappers are found.  Only create array if/when we encounter first wrapper
         object[]? objs = null;
         for (int i = 0; i < parameters.Length; i++)
         {
             object param = parameters[i];
             if (param is IJSObjectWrapper wrapper)
             {
+                // if first wrapper encountered, copy array up till this point
                 if (objs == null)
                     objs = TypedArrayToObjectArray(parameters, i);
 
-                objs[i] = wrapper.JSObject;
+                objs[i] = wrapper.JSObject; // unwrap
+            }
+            else if (objs != null) // if we created new array for unwrapping 
+            {
+                // then finish copying any normal params into remainder of new array
+                objs[i] = param;
             }
         }
         if (objs == null)
@@ -135,7 +147,7 @@ internal static class JSImportInstanceHelpers
             return objs;
         }
         else
-        {
+        {            
             object[] objs2 = new object[objs.Length];
             Array.Copy(objs, objs2, index + 1);
             return objs2;

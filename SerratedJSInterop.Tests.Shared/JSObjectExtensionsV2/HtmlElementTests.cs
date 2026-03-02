@@ -1,5 +1,6 @@
 using SerratedSharp.SerratedDom;
 using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJQ.Plain;
 using Wasm;
 
 namespace Tests.Wasm;
@@ -36,11 +37,11 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var body = doc.Body;
+            var container = new HtmlElement(tc.Get(0));
             var div = doc.CreateElement("div");
             div.Id = "parent-test-child";
-            body.AppendChild(div);
-            Assert(div.ParentElement != null, "ParentElement should be non-null after append to body");
+            container.AppendChild(div);
+            Assert(div.ParentElement != null, "ParentElement should be non-null after append to container");
             Assert(div.ParentElement!.JSObject != null, "ParentElement JSObject should not be null");
         }
     }
@@ -103,12 +104,12 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var body = doc.Body;
+            var container = new HtmlElement(tc.Get(0));
             var div = doc.CreateElement("div");
             div.Id = "append-void-target";
-            body.AppendChild(div);
-            var found = doc.GetElementById("append-void-target");
-            Assert(found != null, "AppendChild (void) should have appended the node so GetElementById finds it");
+            container.AppendChild(div);
+            var found = tc.Find("#append-void-target").Get(0);
+            Assert(found != null, "AppendChild (void) should have appended the node so find within tc finds it");
         }
     }
 
@@ -123,12 +124,13 @@ public partial class TestsContainer
             var child = doc.CreateElement("span");
             child.Id = "remove-child";
             parent.AppendChild(child);
-            doc.Body.AppendChild(parent);
+            var container = new HtmlElement(tc.Get(0));
+            container.AppendChild(parent);
             var removed = parent.RemoveChild(child);
             Assert(removed != null, "RemoveChild should return non-null");
             Assert(removed.Id == "remove-child", "Removed element Id should match");
-            var foundInDoc = doc.GetElementById("remove-child");
-            Assert(foundInDoc == null, "Removed child should no longer be in document");
+            var foundInTc = tc.Find("#remove-child").Get(0);
+            Assert(foundInTc == null, "Removed child should no longer be in test container");
         }
     }
 
@@ -145,7 +147,6 @@ public partial class TestsContainer
         }
     }
 
-    /// <summary>HasChildNodes() uses CallJS&lt;bool&gt;() with no parameters (inferred name).</summary>
     public class HtmlElement_HasChildNodes_NoArgCallJS : JSTest
     {
         public override void Run()

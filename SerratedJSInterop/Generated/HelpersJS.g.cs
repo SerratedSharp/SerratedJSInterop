@@ -20,6 +20,14 @@ namespace SerratedSharp.SerratedJSInterop
                 return GlobalProxy.HelpersJSProxyForDotNet.GetArrayObjectItems(jqObject);
         }
 
+        public static JSObject[] MarshalAsArrayOfObjects(JSObject arrayObject)
+        {
+            if (AgnosticRuntime.IsUnoWasmBootstrapLoaded)
+                return GlobalProxy.HelpersJSProxyForUno.MarshalAsArrayOfObjects(arrayObject);
+            else
+                return GlobalProxy.HelpersJSProxyForDotNet.MarshalAsArrayOfObjects(arrayObject);
+        }
+
         public static JSObject ObjectNew(string path, object[] args)
         {
             if (AgnosticRuntime.IsUnoWasmBootstrapLoaded)
@@ -47,6 +55,10 @@ namespace SerratedSharp.SerratedJSInterop
             [return: JSMarshalAs<JSType.Array<JSType.Object>>]
             public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
 
+            [JSImport(baseJSNamespace + ".MarshalAsArrayOfObjects", moduleName)]
+            [return: JSMarshalAs<JSType.Array<JSType.Object>>]
+            public static partial JSObject[] MarshalAsArrayOfObjects(JSObject arrayObject);
+
             [JSImport(baseJSNamespace + ".ObjectNew", moduleName)]
             public static partial JSObject ObjectNew(string path, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] args);
 
@@ -62,6 +74,10 @@ namespace SerratedSharp.SerratedJSInterop
             [JSImport(baseJSNamespace + ".GetArrayObjectItems")]
             [return: JSMarshalAs<JSType.Array<JSType.Object>>]
             public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
+
+            [JSImport(baseJSNamespace + ".MarshalAsArrayOfObjects")]
+            [return: JSMarshalAs<JSType.Array<JSType.Object>>]
+            public static partial JSObject[] MarshalAsArrayOfObjects(JSObject arrayObject);
 
             [JSImport(baseJSNamespace + ".ObjectNew")]
             public static partial JSObject ObjectNew(string path, [JSMarshalAs<JSType.Array<JSType.Any>>] object[] args);

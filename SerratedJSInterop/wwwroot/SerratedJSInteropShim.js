@@ -10,6 +10,13 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
         return arrayObject.items;
     }
 
+    // Marshal a native JS array of objects into a form that can be returned
+    // as JSObject[] on the .NET side. The interop marshaller handles the
+    // conversion when used with [return: JSMarshalAs<JSType.Array<JSType.Object>>].
+    HelpersShim.MarshalAsArrayOfObjects = function (arrayObject) {
+        return arrayObject;
+    }
+
     HelpersShim.LoadScript = function (relativeUrl) {
         return new Promise(function (resolve, reject) {
             var script = document.createElement("script");

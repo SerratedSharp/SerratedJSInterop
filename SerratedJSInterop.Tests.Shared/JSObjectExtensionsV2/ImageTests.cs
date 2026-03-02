@@ -7,7 +7,6 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    /// <summary>1x1 transparent PNG (smallest valid PNG data URL for testing).</summary>
     private const string OnePixelPngDataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApgAAAKYB3X3/OAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJtZZPbBtFFMZ/M7ubXdtdb1xSFyeilBapySVU8h8OoFaooFSqiihIVIpQBKci6KEg9Q6H9kovIHoCIVQJJCKE1ENFjnAgcaSGC6rEnxBwA04Tx43t2FnvDAfjkNibxgHxnWb2e/u992bee7tCa00YFsffekFY+nUzFtjW0LrvjRXrCDIAaPLlW0nHL0SsZtVoaF98mLrx3pdhOqLtYPHChahZcYYO7KvPFxvRl5XPp1sN3adWiD1ZAqD6XYK1b/dvE5IWryTt2udLFedwc1+9kLp+vbbpoDh+6TklxBeAi9TL0taeWpdmZzQDry0AcO+jQ12RyohqqoYoo8RDwJrU+qXkjWtfi8Xxt58BdQuwQs9qC/afLwCw8tnQbqYAPsgxE1S6F3EAIXux2oQFKm0ihMsOF71dHYx+f3NND68ghCu1YIoePPQN1pGRABkJ6Bus96CutRZMydTl+TvuiRW1m3n0eDl0vRPcEysqdXn+jsQPsrHMquGeXEaY4Yk4wxWcY5V/9scqOMOVUFthatyTy8QyqwZ+kDURKoMWxNKr2EeqVKcTNOajqKoBgOE28U4tdQl5p5bwCw7BWquaZSzAPlwjlithJtp3pTImSqQRrb2Z8PHGigD4RZuNX6JYj6wj7O4TFLbCO/Mn/m8R+h6rYSUb3ekokRY6f/YukArN979jcW+V/S8g0eT/N3VN3kTqWbQ428m9/8k0P/1aIhF36PccEl6EhOcAUCrXKZXXWS3XKd2vc/TRBG9O5ELC17MmWubD2nKhUKZa26Ba2+D3P+4/MNCFwg59oWVeYhkzgN/JDR8deKBoD7Y+ljEjGZ0sosXVTvbc6RHirr2reNy1OXd6pJsQ+gqjk8VWFYmHrwBzW/n+uMPFiRwHB2I7ih8ciHFxIkd/3Omk5tCDV1t+2nNu5sxxpDFNx+huNhVT3/zMDz8usXC3ddaHBj1GHj/As08fwTS7Kt1HBTmyN29vdwAw+/wbwLVOJ3uAD1wi/dUH7Qei66PfyuRj4Ik9is+hglfbkbfR3cnZm7chlUWLdwmprtCohX4HUtlOcQjLYCu+fzGJH2QRKvP3UNz8bWk1qMxjGTOMThZ3kvgLI5AzFfo379UAAAAASUVORK5CYII=";
 
     public class Image_Src_Base64DataUrl : JSTest
@@ -20,7 +19,7 @@ public partial class TestsContainer
             img.Alt = "1x1 PNG";
             img.Width = 24;
             img.Height = 24;
-            _ = tc.JSObject.CallJS<object>("append", SerratedJS.Params(img.JSObject));
+            _ = tc.JSObject.CallJS<object>(funcName: "append", img.JSObject);
             result = tc.Children();
             Assert(img.Src == OnePixelPngDataUrl || img.Src.StartsWith("data:image", StringComparison.OrdinalIgnoreCase),
                 "Image Src should round-trip or at least start with data:image");
@@ -106,6 +105,68 @@ public partial class TestsContainer
             var img = new Image();
             img.CrossOrigin = "anonymous";
             Assert(img.CrossOrigin == "anonymous", "CrossOrigin should round-trip");
+        }
+    }
+
+    public class Image_GetAttribute : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.Alt = "my-alt";
+            var alt = img.GetAttribute("alt");
+            Assert(alt == "my-alt", "GetAttribute(\"alt\") should return set Alt value");
+            img.SetAttribute("data-foo", "bar");
+            var dataFoo = img.GetAttribute("data-foo");
+            Assert(dataFoo == "bar", "GetAttribute(\"data-foo\") should return value set via SetAttribute");
+        }
+    }
+
+    public class Image_SetAttribute_GetAttribute_RoundTrip : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.SetAttribute("data-test", "roundtrip-value");
+            var value = img.GetAttribute("data-test");
+            Assert(value == "roundtrip-value", "SetAttribute then GetAttribute should round-trip");
+        }
+    }
+
+    public class Image_RemoveAttribute : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.SetAttribute("data-remove-me", "present");
+            Assert(img.GetAttribute("data-remove-me") == "present", "Attribute should be set");
+            img.RemoveAttribute("data-remove-me");
+            var after = img.GetAttribute("data-remove-me");
+            Assert(after == null || after == "", "RemoveAttribute should remove the attribute");
+        }
+    }
+
+    public class Image_GetBoundingClientRect : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            var img = new Image();
+            img.Src = OnePixelPngDataUrl;
+            _ = tc.JSObject.CallJS<object>(funcName: "append", img.JSObject);
+            var rect = img.GetBoundingClientRect();
+            Assert(rect != null, "GetBoundingClientRect should return non-null when element is in DOM");
+        }
+    }
+
+    public class Image_Focus_Blur_NoThrow : JSTest
+    {
+        public override void Run()
+        {
+            var img = new Image();
+            img.Focus();
+            img.Blur();
+            Assert(true, "Focus() and Blur() should not throw");
         }
     }
 }

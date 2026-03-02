@@ -6,7 +6,7 @@ namespace SerratedSharp.SerratedJSInterop
     {
         public static class Console
         {
-            static Lazy<JSObject> _console = new(() => JSHost.GlobalThis.GetProperty<JSObject>("console"));
+            static Lazy<JSObject> _console = new(() => JSHost.GlobalThis.GetJSProperty<JSObject>("console"));
 
             /// <summary>
             /// console.log(...)

@@ -29,35 +29,47 @@ public class Image : HtmlElement, IJSObjectWrapper<Image>
 
     public string Src
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
 
     public string Alt
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
 
     public int Width
     {
-        get => this.GetProperty<int>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<int>();
+        set => this.SetJSProperty(value);
     }
 
     public int Height
     {
-        get => this.GetProperty<int>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<int>();
+        set => this.SetJSProperty(value);
     }
 
-    public int NaturalWidth => this.GetProperty<int>();
-    public int NaturalHeight => this.GetProperty<int>();
-    public bool Complete => this.GetProperty<bool>();
-    public string CurrentSrc => this.GetProperty<string>();
+    public int NaturalWidth => this.GetJSProperty<int>();
+    public int NaturalHeight => this.GetJSProperty<int>();
+    public bool Complete => this.GetJSProperty<bool>();
+    public string CurrentSrc => this.GetJSProperty<string>();
     public string CrossOrigin
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
+
+    /// <summary>Returns the DOMRect for this element (inherited from Element).</summary>
+    public JSObject GetBoundingClientRect() => this.CallJS<JSObject>();
+
+    /// <summary>Removes the named attribute (inherited from Element).</summary>
+    public void RemoveAttribute(string name) => this.CallJS(funcName: "removeAttribute", name);
+
+    /// <summary>Gives focus to this element (inherited from HTMLElement).</summary>
+    public void Focus() => this.CallJS();
+
+    /// <summary>Removes focus from this element (inherited from HTMLElement).</summary>
+    public void Blur() => this.CallJS();
 }

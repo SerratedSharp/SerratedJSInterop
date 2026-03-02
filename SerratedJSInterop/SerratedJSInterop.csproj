@@ -14,9 +14,9 @@
 	</Description>
     <Copyright>Copyright (c) SerratedSharpSolutions 2026</Copyright>
     <PackageTags>WebAssembly; Blazor; JSInterop; JSImport; WasmBrowser</PackageTags>
-            <Version>0.3.1</Version>
-    <AssemblyVersion>0.3.1.0</AssemblyVersion>
-        <FileVersion>0.3.1.0</FileVersion>
+            <Version>0.3.2</Version>
+    <AssemblyVersion>0.3.2.0</AssemblyVersion>
+        <FileVersion>0.3.2.0</FileVersion>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <AssemblyName>SerratedSharp.SerratedJSInterop</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -68,5 +68,10 @@
     <Folder Include="Deprecated\" />
     <Folder Include="Generated\" />
   </ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
 
 </Project>

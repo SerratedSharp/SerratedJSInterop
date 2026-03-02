@@ -1,14 +1,12 @@
 using SerratedSharp.SerratedDom;
 using SerratedSharp.SerratedJSInterop;
+using SerratedSharp.SerratedJQ.Plain;
 using Wasm;
 
 namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    /// <summary>
-    /// Helper so that IJSObjectWrapper.CallJS(JSParams, [CallerMemberName]) is invoked with funcName = "AppendChild" (→ "appendChild" in JS).
-    /// </summary>
     private static class VoidCallJSHelperWrapper
     {
         public static void AppendChild(IJSObjectWrapper parent, object child)
@@ -23,10 +21,10 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var div = doc.CallJS<HtmlElement>("createElement", "div");
+            var div = doc.CallJS<HtmlElement>(funcName:"createElement", "div");
             Assert(div != null, "createElement via IJSObjectWrapper.CallJS<HtmlElement>(string, params object[]) should return non-null");
             Assert(div!.JSObject != null, "Created element JSObject should not be null");
-            var tagName = div.GetProperty<string>("tagName");
+            var tagName = div.GetJSProperty<string>("tagName");
             Assert(tagName == "DIV", "Created element tagName should be DIV");
         }
     }
@@ -37,13 +35,13 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var body = doc.Body;
+            var container = new HtmlElement(tc.Get(0));
             var span = doc.CreateElement("span");
             JSImportInstanceHelpers.SetProperty(span.JSObject, "id", "calljs-wrapper-void-callername-id");
 
-            VoidCallJSHelperWrapper.AppendChild(body, span);
+            VoidCallJSHelperWrapper.AppendChild(container, span);
 
-            var found = doc.GetElementById("calljs-wrapper-void-callername-id");
+            var found = tc.Find("#calljs-wrapper-void-callername-id").Get(0);
             Assert(found != null, "appendChild via IJSObjectWrapper.CallJS(JSParams, CallerMemberName) should have appended the node");
         }
     }
@@ -54,13 +52,13 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var body = doc.Body;
+            var container = new HtmlElement(tc.Get(0));
             var div = doc.CreateElement("div");
             JSImportInstanceHelpers.SetProperty(div.JSObject, "id", "calljs-wrapper-void-explicit-jsparams-id");
 
-            body.CallJS("appendChild", SerratedJS.Params(div));
+            container.CallJS(funcName: "appendChild", SerratedJS.Params(div));
 
-            var found = doc.GetElementById("calljs-wrapper-void-explicit-jsparams-id");
+            var found = tc.Find("#calljs-wrapper-void-explicit-jsparams-id").Get(0);
             Assert(found != null, "appendChild via IJSObjectWrapper.CallJS(string, JSParams) should have appended the node");
         }
     }
@@ -71,13 +69,13 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             var doc = Document.GetDocument();
-            var body = doc.Body;
+            var container = new HtmlElement(tc.Get(0));
             var div = doc.CreateElement("div");
             JSImportInstanceHelpers.SetProperty(div.JSObject, "id", "calljs-wrapper-void-params-id");
 
-            body.CallJS("appendChild", div);
+            container.CallJS(funcName: "appendChild", div);
 
-            var found = doc.GetElementById("calljs-wrapper-void-params-id");
+            var found = tc.Find("#calljs-wrapper-void-params-id").Get(0);
             Assert(found != null, "appendChild via IJSObjectWrapper.CallJS(string, params object[]) should have appended the node");
         }
     }

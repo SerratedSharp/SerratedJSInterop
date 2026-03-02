@@ -12,14 +12,14 @@ namespace SerratedSharp.SerratedDom;
 public class Document:IJSObjectWrapper
 {
     public static Document GetDocument() => new Document();
-    static readonly Lazy<JSObject> _document = new(() => JSHost.GlobalThis.GetProperty<JSObject>("document"));
+    static readonly Lazy<JSObject> _document = new(() => JSHost.GlobalThis.GetJSProperty<JSObject>("document"));
     public JSObject JSObject => _document.Value;
     
-    public HtmlElement Body => this.GetProperty<HtmlElement>(); // Name inferred with [CallerMemberName]
-    public HtmlElement DocumentElement => this.GetProperty<HtmlElement>(nameof(DocumentElement)); // Name provided explicitly, but derived from nameof()
-    public HtmlElement Head => this.GetProperty<HtmlElement>("head");// Explicit name
-    public string DocumentURI => this.GetProperty<string>();
-    public string CharacterSet => this.GetProperty<string>();
+    public HtmlElement Body => this.GetJSProperty<HtmlElement>(); // Name inferred with [CallerMemberName]
+    public HtmlElement DocumentElement => this.GetJSProperty<HtmlElement>(nameof(DocumentElement)); // Name provided explicitly, but derived from nameof()
+    public HtmlElement Head => this.GetJSProperty<HtmlElement>("head");// Explicit name
+    public string DocumentURI => this.GetJSProperty<string>();
+    public string CharacterSet => this.GetJSProperty<string>();
 
 
     public HtmlElement CreateElement(string tagName)
@@ -27,7 +27,7 @@ public class Document:IJSObjectWrapper
 
     // Optionally provide explicit function name.
     public HtmlElement? QuerySelector(string selector)
-        => this.CallJS<HtmlElement?>("querySelector", selector);
+        => this.CallJS<HtmlElement?>(funcName:"querySelector", selector);
 
     public HtmlElement GetElementById(string id)
         => this.CallJS<HtmlElement>(SerratedJS.Params(id));

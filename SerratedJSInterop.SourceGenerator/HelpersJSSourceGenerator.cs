@@ -82,8 +82,7 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
                     TryDelete(Path.Combine(dir, "HelpersProxy.g.cs"));
                     TryDelete(Path.Combine(dir, "InstanceHelper.g.cs"));
                     TryDelete(Path.Combine(dir, "InstanceHelperProxy.g.cs"));
-                    var agnosticRuntime = GenerateAgnosticRuntime();
-                    File.WriteAllText(Path.Combine(dir, "AgnosticRuntime.g.cs"), agnosticRuntime, Encoding.UTF8);
+                    TryDelete(Path.Combine(dir, "AgnosticRuntime.g.cs"));
                     foreach (var classInfo in classes)
                     {
                         var baseName = GetBaseName(classInfo.TypeName);
@@ -97,8 +96,6 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
             }
             else
             {
-                var agnosticRuntime = GenerateAgnosticRuntime();
-                sp.AddSource("AgnosticRuntime.g.cs", SourceText.From(agnosticRuntime, Encoding.UTF8));
                 foreach (var classInfo in classes)
                 {
                     var baseName = GetBaseName(classInfo.TypeName);
@@ -109,35 +106,6 @@ public sealed class HelpersJSSourceGenerator : IIncrementalGenerator
                 }
             }
         });
-    }
-
-    private static string GenerateAgnosticRuntime()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("using System.Runtime.InteropServices.JavaScript;");
-        sb.AppendLine();
-        sb.AppendLine("namespace SerratedSharp.SerratedJSInterop");
-        sb.AppendLine("{");
-        sb.AppendLine("    /// <summary>Shared runtime flag for Uno vs .NET WASM. Used by generated proxy routing.</summary>");
-        sb.AppendLine("    public static class AgnosticRuntime");
-        sb.AppendLine("    {");
-        sb.AppendLine("        /// <summary>");
-        sb.AppendLine("        /// Gets a value indicating whether being used from Uno.Wasm.Bootstrap rather than .NET WasmBrowser.");
-        sb.AppendLine("        /// </summary>");
-        sb.AppendLine("        internal static bool IsUnoWasmBootstrapLoaded => isUnoWasmBootstrapLoaded.Value;");
-        sb.AppendLine("        private static Lazy<bool> isUnoWasmBootstrapLoaded = new Lazy<bool>(() =>");
-        sb.AppendLine("        {");
-        sb.AppendLine("            bool isUnoPresent = false;");
-        sb.AppendLine("            if (JSHost.GlobalThis.HasProperty(\"IsFromUno\"))");
-        sb.AppendLine("            {");
-        sb.AppendLine("                if (JSHost.GlobalThis.GetPropertyAsBoolean(\"IsFromUno\"))");
-        sb.AppendLine("                    isUnoPresent = true;");
-        sb.AppendLine("            }");
-        sb.AppendLine("            return isUnoPresent;");
-        sb.AppendLine("        });");
-        sb.AppendLine("    }");
-        sb.AppendLine("}");
-        return sb.ToString();
     }
 
     /// <summary>Returns content for a single {BaseName}.g.cs file, or null if type has no methods.</summary>
