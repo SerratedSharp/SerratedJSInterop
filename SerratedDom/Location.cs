@@ -14,7 +14,7 @@ public sealed class Location
     private readonly JSObject _js;
 
     private static readonly Lazy<JSObject> location = new(() =>
-        JSHost.GlobalThis.GetProperty<JSObject>("location"));
+        JSHost.GlobalThis.GetJSProperty<JSObject>("location"));
 
     public Location(JSObject jsObject)
     {
@@ -25,8 +25,8 @@ public sealed class Location
 
     public string Href
     {
-        get => _js.GetProperty<string>();
-        set => _js.SetProperty(value);
+        get => _js.GetJSProperty<string>();
+        set => _js.SetJSProperty(value);
     }
 
     public void Reload() => _js.CallJS();

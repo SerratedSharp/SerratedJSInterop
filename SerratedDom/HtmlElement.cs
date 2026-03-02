@@ -32,26 +32,26 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
 
     public string Id
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
 
     public string ClassName
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
 
-    public HtmlElement? ParentElement => this.GetProperty<HtmlElement?>();
-    public HtmlElement? FirstElementChild => this.GetProperty<HtmlElement?>();
-    public HtmlElement? LastElementChild => this.GetProperty<HtmlElement?>();
+    public HtmlElement? ParentElement => this.GetJSProperty<HtmlElement?>();
+    public HtmlElement? FirstElementChild => this.GetJSProperty<HtmlElement?>();
+    public HtmlElement? LastElementChild => this.GetJSProperty<HtmlElement?>();
 
     /// <summary>Returns whether this element has any child nodes. No parameters; demonstrates CallJS&lt;J&gt;() with inferred name.</summary>
     public bool HasChildNodes() => this.CallJS<bool>();
-    public int OffsetWidth => this.GetProperty<int>();
-    public int OffsetHeight => this.GetProperty<int>();
-    public int ClientWidth => this.GetProperty<int>();
-    public int ClientHeight => this.GetProperty<int>();
+    public int OffsetWidth => this.GetJSProperty<int>();
+    public int OffsetHeight => this.GetJSProperty<int>();
+    public int ClientWidth => this.GetJSProperty<int>();
+    public int ClientHeight => this.GetJSProperty<int>();
 
     // CallJS with inferred function name via [CallerMemberName]
     public void AppendChild(IJSObjectWrapper child)
@@ -59,36 +59,36 @@ public class HtmlElement : IJSObjectWrapper<HtmlElement>
 
     // CallJS with IJSObjectWrapper<T> return, automatically wrapping the JSObject result in HtmlElement
     public HtmlElement RemoveChild(HtmlElement child)
-        => this.CallJS<HtmlElement>("removeChild", child);
+        => this.CallJS<HtmlElement>(funcName: "removeChild", child);
 
     /// <summary>Inserts newChild before referenceChild (multiple params via SerratedJS.Params). Pass null as referenceChild to insert at end.</summary>
     public HtmlElement InsertBefore(HtmlElement newChild, HtmlElement? referenceChild)
-        => this.CallJS<HtmlElement>("insertBefore", SerratedJS.Params(newChild.JSObject, referenceChild?.JSObject));
+        => this.CallJS<HtmlElement>(funcName: "insertBefore", SerratedJS.Params(newChild.JSObject, referenceChild?.JSObject));
      
     public void SetAttribute(string name, string value)
-        => this.CallJS("setAttribute", name, value); // CallJS with void return
+        => this.CallJS(funcName: "setAttribute", name, value); // CallJS with void return
 
     public string GetAttribute(string name)
-        => this.CallJS<string>("getAttribute", name); // CallJS with string return
+        => this.CallJS<string>(funcName:"getAttribute", name); // CallJS with string return
 
     public string TextContent
     {
-        get => this.GetProperty<string>("TextContent");
-        set => this.SetProperty(value, "TextContent");
+        get => this.GetJSProperty<string>("TextContent");
+        set => this.SetJSProperty(propertyName:"TextContent", value);
     }
 
     public string InnerHtml
     {
-        get => this.GetProperty<string>("InnerHtml");
-        set => this.SetProperty(value, "InnerHtml");
+        get => this.GetJSProperty<string>("InnerHtml");
+        set => this.SetJSProperty(propertyName:"InnerHtml", value);
     }
 
     public string OuterHtml
     {
-        get => this.GetProperty<string>("OuterHtml");
-        set => this.SetProperty(value, "OuterHtml");
+        get => this.GetJSProperty<string>("OuterHtml");
+        set => this.SetJSProperty(propertyName:"OuterHtml", value);
     }
 
     /// <summary>Returns a DOMTokenList wrapper around this element's classList (does not implement IJSObjectWrapper).</summary>
-    public DomTokenList ClassList => new DomTokenList(this.GetProperty<JSObject>());
+    public DomTokenList ClassList => new DomTokenList(this.GetJSProperty<JSObject>());
 }

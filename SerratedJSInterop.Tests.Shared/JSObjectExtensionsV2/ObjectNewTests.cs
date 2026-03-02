@@ -24,8 +24,8 @@ public partial class TestsContainer
             
             var opt = SerratedJS.New("Option", SerratedJS.Params("Display text", "optValue"));
             Assert(opt != null, "New<JSObject>(\"Option\", ...) returned null");
-            Assert(opt.GetProperty<string>("Text") == "Display text", "Option text was not set");
-            Assert(opt.GetProperty<string>("Value") == "optValue", "Option value was not set");
+            Assert(opt.GetJSProperty<string>("Text") == "Display text", "Option text was not set");
+            Assert(opt.GetJSProperty<string>("Value") == "optValue", "Option value was not set");
         }
     }
 
@@ -35,8 +35,8 @@ public partial class TestsContainer
         {
             var opt = SerratedJS.New("Option", "Display text", "optValue");
             Assert(opt != null, "New<JSObject>(\"Option\", ...) returned null");
-            Assert(opt.GetProperty<string>("Text") == "Display text", "Option text was not set");
-            Assert(opt.GetProperty<string>("Value") == "optValue", "Option value was not set");
+            Assert(opt.GetJSProperty<string>("Text") == "Display text", "Option text was not set");
+            Assert(opt.GetJSProperty<string>("Value") == "optValue", "Option value was not set");
         }
     }
 
@@ -47,7 +47,7 @@ public partial class TestsContainer
             StubHtmlIntoTestContainer(0);
             var imgJs = SerratedJS.New("Image");
             var img = new Image(imgJs);
-            _ = tc.JSObject.CallJS<object>("append", SerratedJS.Params(img.JSObject));
+            _ = tc.JSObject.CallJS<object>(funcName: "append", img.JSObject);
             img.Alt = "test-alt";
             Assert(img.Alt == "test-alt", "Image Alt was not set after New");
             result = tc.Children();
@@ -71,9 +71,9 @@ public partial class TestsContainer
     {
         public override void Run()
         {
-            var evt = SerratedJS.New("CustomEvent", SerratedJS.Params("myevent", new { detail = 42 }.MarshalAsJson()));
+            var evt = SerratedJS.New("CustomEvent",  SerratedJS.Params( "myevent", new { detail = 42 }.MarshalAsJson()));
             Assert(evt != null, "New CustomEvent returned null");
-            var detail = evt.GetProperty<double>("detail");
+            var detail = evt.GetJSProperty<double>("detail");
             Assert(detail == 42, "CustomEvent detail was not 42");
         }
     }
@@ -84,7 +84,7 @@ public partial class TestsContainer
         {
             var evt = SerratedJS.New("CustomEvent", "myevent", new { detail = 42 }.MarshalAsJson());
             Assert(evt != null, "New CustomEvent returned null");
-            var detail = evt.GetProperty<double>("detail");
+            var detail = evt.GetJSProperty<double>("detail");
             Assert(detail == 42, "CustomEvent detail was not 42");
         }
     }
@@ -105,7 +105,7 @@ public partial class TestsContainer
             var img = new Image();
             Assert(img != null, "new Image() returned null");
             Assert(img.JSObject != null, "JSObject is null");
-            var tagName = img.GetProperty<string>("tagName");
+            var tagName = img.GetJSProperty<string>("tagName");
             Assert(tagName == "IMG", "Expected tagName IMG for Image");
         }
     }

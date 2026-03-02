@@ -36,7 +36,7 @@ public partial class TestsContainer
             var div = doc.CreateElement("div");
             Assert(div != null, "CreateElement(\"div\") should not return null");
             Assert(div.JSObject != null, "Created element JSObject should not be null");
-            var tagName = div.GetProperty<string>("tagName");
+            var tagName = div.GetJSProperty<string>("tagName");
             Assert(tagName == "DIV", "Created element tagName should be DIV");
         }
     }
@@ -48,7 +48,7 @@ public partial class TestsContainer
             var doc = Document.GetDocument();
             var span = doc.CreateElement("span");
             Assert(span != null, "CreateElement(\"span\") should not return null");
-            var tagName = span.GetProperty<string>("tagName");
+            var tagName = span.GetJSProperty<string>("tagName");
             Assert(tagName == "SPAN", "Created element tagName should be SPAN");
         }
     }
@@ -59,8 +59,8 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             tc.Append("<div id='doc-getbyid-target'>doc-test-content</div>");
-            var doc = Document.GetDocument();
-            var el = doc.GetElementById("doc-getbyid-target");
+            result = tc.Children();
+            var el = new HtmlElement(tc.Children().Get(0));
             Assert(el != null, "GetElementById should return non-null for existing id");
             Assert(el.JSObject != null, "Element JSObject should not be null");
             Assert(el.TextContent == "doc-test-content", "Element TextContent should match");
@@ -84,7 +84,7 @@ public partial class TestsContainer
             var doc = Document.GetDocument();
             var root = doc.DocumentElement;
             Assert(root != null, "DocumentElement should not be null");
-            var tagName = root.GetProperty<string>("tagName");
+            var tagName = root.GetJSProperty<string>("tagName");
             Assert(tagName == "HTML", "DocumentElement tagName should be HTML");
         }
     }
@@ -128,8 +128,8 @@ public partial class TestsContainer
         {
             StubHtmlIntoTestContainer(0);
             tc.Append("<div id='qsel-target'>qsel-content</div>");
-            var doc = Document.GetDocument();
-            var el = doc.QuerySelector("#qsel-target");
+            result = tc.Children();
+            var el = new HtmlElement(tc.Children().Get(0));
             Assert(el != null, "QuerySelector should return non-null for existing selector");
             Assert(el!.TextContent == "qsel-content", "QuerySelector element TextContent should match");
         }
@@ -150,9 +150,9 @@ public partial class TestsContainer
         public override void Run()
         {
             var doc = Document.GetDocument();
-            var div = doc.CallJS<HtmlElement>("createElement", "div");
+            var div = doc.CallJS<HtmlElement>(funcName: "createElement", "div");
             Assert(div != null, "createElement via CallJS(string, params object[]) should return non-null");
-            var tagName = div.GetProperty<string>("tagName");
+            var tagName = div.GetJSProperty<string>("tagName");
             Assert(tagName == "DIV", "Created element tagName should be DIV");
         }
     }

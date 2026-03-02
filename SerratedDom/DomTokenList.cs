@@ -22,23 +22,26 @@ public sealed class DomTokenList
     }
 
     /// <summary>Number of tokens. Uses GetProperty (CallerMemberName).</summary>
-    public int Length => _js.GetProperty<int>();
+    public int Length => _js.GetJSProperty<int>();
 
-    // Infers CallerMemberName, with required SerratedJS.Params for overloads that both infer name and pass params
-    public string Item(int index) => _js.CallJS<string>(SerratedJS.Params(index));
+    // Infers CallerMemberName
+    public string Item(int index) => _js.CallJS<string>(index);
 
-    // Explicit method name, with SerratedJS.Params (not required for this overload)
-    public bool Contains(string token) => _js.CallJS<bool>("contains", SerratedJS.Params(token));
+    // Infers CallerMemberName
+    public bool Contains(string token) => _js.CallJS<bool>(token);
 
-    // Explicit method name, without SerratedJS.Params
-    public string ItemByIndex(int index) => _js.CallJS<string>("item", index);
+    // Explicit method name
+    public string ItemByIndex(int index) => _js.CallJS<string>(funcName: "item", index);
 
-    // Void return with inferred method name and SerratedJS.Params
+    // Void return with inferred method name and SerratedJS.Params (not required in this case)
     public void Add(string token) => _js.CallJS(SerratedJS.Params(token));
+        
+    // Void return(no <J>), explicit method name, optionally use SerratedJS.Params
+    public void Remove(string token) => _js.CallJS(funcName: "remove", SerratedJS.Params(token));
 
-    // Void return with explicit method name and SerratedJS.Params(not required for this overload)
-    public void Remove(string token) => _js.CallJS("remove", SerratedJS.Params(token));
+    // Void return with explicit method name, passing multiple parameters
+    public void RemoveMultiple(string t1, string t2) => _js.CallJS(funcName: "remove", t1, t2);
 
-    // Void return with explicit method name, without SerratedJS.Params
-    public void RemoveMultiple(string t1, string t2) => _js.CallJS("remove", t1, t2);
+    // Alternatively with SerratedJS.Params
+    public void RemoveMultipleV2(string t1, string t2) => _js.CallJS(funcName: "remove", SerratedJS.Params(t1, t2));
 }

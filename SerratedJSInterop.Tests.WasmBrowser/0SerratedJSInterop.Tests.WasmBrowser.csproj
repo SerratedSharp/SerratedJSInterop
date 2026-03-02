@@ -13,6 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <!--Included transitively by SerratedJQ: <PackageReference Include="SerratedSharp.JSInteropHelpers" Version="0.1.7" />-->
-    <PackageReference Include="SerratedSharp.SerratedJQ" Version="0.1.8" />
+    <PackageReference Include="SerratedSharp.SerratedJQ" Version="0.2.1" />
   </ItemGroup>
 </Project>

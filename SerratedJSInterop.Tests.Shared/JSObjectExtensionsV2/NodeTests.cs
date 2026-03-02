@@ -6,7 +6,6 @@ namespace Tests.Wasm;
 
 public partial class TestsContainer
 {
-    /// <summary>InsertBefore(newChild, referenceChild) with two params via SerratedJS.Params; inserted node becomes first child.</summary>
     public class Node_InsertBefore_InsertsBeforeReference : JSTest
     {
         public override void Run()
@@ -29,7 +28,6 @@ public partial class TestsContainer
         }
     }
 
-    /// <summary>InsertBefore(newChild, null) inserts at end (like appendChild).</summary>
     public class Node_InsertBefore_NullReference_InsertsAtEnd : JSTest
     {
         public override void Run()

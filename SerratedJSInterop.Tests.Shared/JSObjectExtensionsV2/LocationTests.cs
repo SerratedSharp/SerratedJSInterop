@@ -17,7 +17,6 @@ public partial class TestsContainer
         }
     }
 
-    /// <summary>Read-only Location test; does not call Assign or Reload (they cause navigation).</summary>
     public class Location_GetLocation_AndHref : JSTest
     {
         public override void Run()

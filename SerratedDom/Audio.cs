@@ -40,13 +40,13 @@ public class Audio : IJSObjectWrapper<Audio>
 
     public string Src
     {
-        get => this.GetProperty<string>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<string>();
+        set => this.SetJSProperty(value);
     }
 
-    public double Duration => this.GetProperty<double>();
-    public bool IsPaused => this.GetProperty<bool>("paused");        
-    public DomTokenList ControlsList => this.GetProperty<DomTokenList>(); // Returning another wrapped type
+    public double Duration => this.GetJSProperty<double>();
+    public bool IsPaused => this.GetJSProperty<bool>("paused");        
+    public DomTokenList ControlsList => this.GetJSProperty<DomTokenList>(); // Returning another wrapped type
     public void AddTextTrack(string kind, string label, string language)
         => this.CallJS("addTextTrack", kind, label, language);
     public void CanPlayType(string type) => this.CallJS(type);
@@ -56,14 +56,14 @@ public class Audio : IJSObjectWrapper<Audio>
 
     public double Volume
     {
-        get => this.GetProperty<double>();
-        set => this.SetProperty(value);
+        get => this.GetJSProperty<double>();
+        set => this.SetJSProperty(value);
     }
 
     public bool IsMuted
     {
-        get => this.GetProperty<bool>("muted");
-        set => this.SetProperty(value, "muted");
+        get => this.GetJSProperty<bool>("muted");
+        set => this.SetJSProperty(value, "muted");
     }
 
     public void Pause() => this.CallJS();

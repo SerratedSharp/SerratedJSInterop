@@ -50,17 +50,17 @@ public partial class TestsContainer
             //var parentWrapped = JSImportInstanceHelpers.GetPropertyOfSameNameAsWrapped<DomElementProxy>(childDiv, propertyName: "ParentElement");
 
 
-            var document = JSHost.GlobalThis.GetProperty<JSObject>("document");
-            var parentDiv = document.CallJS<JSObject>("createElement", SerratedJS.Params("div"));
-            var childDiv = document.CallJS<JSObject>("createElement", SerratedJS.Params("div"));
+            var document = JSHost.GlobalThis.GetJSProperty<JSObject>("document");
+            var parentDiv = document.CallJS<JSObject>(funcName: "createElement", SerratedJS.Params("div"));
+            var childDiv = document.CallJS<JSObject>(funcName: "createElement", SerratedJS.Params("div"));
             parentDiv.SetProperty("id", "parent-id");
             childDiv.SetProperty("id", "child-id");
-            _ = parentDiv.CallJS<JSObject>("appendChild", SerratedJS.Params(childDiv));
+            _ = parentDiv.CallJS<JSObject>(funcName:"appendChild", SerratedJS.Params(childDiv));
             // Append parentDiv into test container using jQuery .append()
-            _ = tc.JSObject.CallJS<object>("append", SerratedJS.Params(parentDiv));
+            _ = tc.JSObject.CallJS<object>(funcName:"append", SerratedJS.Params(parentDiv));
 
             // Act: fetch parentElement wrapped
-            var parentWrapped = childDiv.GetProperty<DomElementProxy>(propertyName: "ParentElement");
+            var parentWrapped = childDiv.GetJSProperty<DomElementProxy>(propertyName: "ParentElement");
             // Assert
             Assert(parentWrapped != null, "Wrapped parent element is null");
             Assert(parentWrapped.Id == "parent-id", "parentElement did not wrap correctly or wrong element returned");
@@ -85,17 +85,17 @@ public partial class TestsContainer
             //var childProxy = new DomElementProxy(childDiv);
             //var parentWrapped = childProxy.GetPropertyOfSameNameAsWrapped<DomElementProxy>(propertyName: "ParentElement");
 
-            var document = JSHost.GlobalThis.GetProperty<JSObject>("document");
-            var parentDiv = document.CallJS<JSObject>("createElement", SerratedJS.Params("div"));
-            var childDiv = document.CallJS<JSObject>("createElement", SerratedJS.Params("div"));
+            var document = JSHost.GlobalThis.GetJSProperty<JSObject>("document");
+            var parentDiv = document.CallJS<JSObject>(funcName:"createElement", "div");
+            var childDiv = document.CallJS<JSObject>(funcName:"createElement", SerratedJS.Params("div"));
             parentDiv.SetProperty("id", "ext-parent-id");
             childDiv.SetProperty("id", "ext-child-id");
-            _ = parentDiv.CallJS<JSObject>("appendChild", SerratedJS.Params(childDiv));
-            _ = tc.JSObject.CallJS<object>("append", SerratedJS.Params(parentDiv));
+            _ = parentDiv.CallJS<JSObject>(funcName: "appendChild", SerratedJS.Params(childDiv));
+            _ = tc.JSObject.CallJS<object>(funcName: "append", SerratedJS.Params(parentDiv));
 
             // Wrap childDom as proxy to call extension
             var childProxy = new DomElementProxy(childDiv);
-            var parentWrapped = childProxy.GetProperty<DomElementProxy>("ParentElement");
+            var parentWrapped = childProxy.GetJSProperty<DomElementProxy>("ParentElement");
 
             Assert(parentWrapped != null, "Extension wrapped parent element is null");
             Assert(parentWrapped.Id == "ext-parent-id", "Extension parentElement did not wrap correctly or wrong element returned");
