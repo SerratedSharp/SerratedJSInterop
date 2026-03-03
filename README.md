@@ -126,7 +126,6 @@ There are two main ways to use SerratedJSInterop: wrapping a JS type with C# cla
 - Implement the required static WrapInstance method, which is leveraged by the library to automatically wrap returned instances for calls such as `CallJS<YourType>()`.
 - Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments. 
 - Use `this.GetJSProperty<T>()`, `this.SetJSProperty(value)`, `this.CallJS<T>(...)`, and `this.CallJS(...)` to map properties/methods to the underlying JSObject reference.
-- Use `this.CallJS<T>(funcName:"someJSMethodName",...)`, `GetJSProperty<string>("someJSName")`, and `SetJSProperty(someValue, "someJSName")` to specify JS member names explicitly.
 
 ```csharp
 public class Image : IJSObjectWrapper<Image>
@@ -154,6 +153,20 @@ public class Image : IJSObjectWrapper<Image>
 }
 ```
 
+Use `this.CallJS<T>(funcName:"someJSMethodName",...)`, `GetJSProperty<string>("someJSName")`, and `SetJSProperty(propertyName: "someJSName", someValue)` to specify JS member names explicitly.  Useful where you want to wrap a member with a conventional .NET name, or where you need to specify an explicit casing in lieu of the automatic *lowerCamelCase* adjustment:
+
+```csharp
+public string Source { 
+  get => this.GetJSProperty<string>("src"); 
+  set => this.SetJSProperty(propertyName: "src", value); 
+}
+
+public bool IsComplete => this.GetJSProperty<bool>("complete");
+
+public JSObject GetBoundingClientRectangle() 
+    => this.CallJS<JSObject>(funcName: "getBoundingClientRect");
+```
+
 ### `IJSObjectWrapper<T>`
 
 As shown in later examples, `IJSObjectWrapper<T>` isn't strictly required.  However when implemented, `IJSObjectWrapper<T>` provides the framework the means to automatically wrap a JSObject reference with your C# wrapper type by calling its `.WrapInstance()`.  This allows calls to `.GetJSProperty<J>()` and `.CallJS<J>()` to specify your wrapper `J` as the return type.  These internally call your implementation of .WrapInstance() to instantiate `J` from a `JSObject`.  
@@ -165,7 +178,7 @@ As shown in later examples, `IJSObjectWrapper<T>` isn't strictly required.  Howe
 
 Extension methods such as `GetJSProperty<T>()`, `SetJSProperty(value)`, and `CallJS<T>(...)` have overloads which use the calling C# member name to infer the JS property or method name via [CallerMemberName].  Additional overloads allow the function/property names to be specified explicitly as needed.
 
-The first letter is lowercased for consistency with common JS lowerCamelCase conventions.  (Note: This lower casing convention is not applied for the SerratedJS.New() interop operator, nor for overloads passing explicit names via `funcName:` and `propertyName:`.)
+The first letter is lowercased for consistency with common JS lowerCamelCase conventions.  (Note: This lower casing is not applied for the SerratedJS.New() interop operator, nor for overloads passing explicit names via `funcName:` and `propertyName:` — those preserve the caller's casing so you can use non-standard JS names if needed.)
 
 ```csharp
 // Property getter "Body" infers JS property "body"
@@ -189,7 +202,7 @@ public void AppendChild(IJSObjectWrapper child)
 > [!NOTE] 
 > **Pitfall:** Forgetting to specify an explicit name for adhoc interop where the parent name is not applicable.  For example, `void RunTest() => jsObject.GetJSProperty<int>()` would attempt to access property named "runTest" when the caller likely intended `jsObject.GetJSProperty<int>("someJSPropertyName")` 
 
-**Explicit names:** JS names can be specified explicitly instead of being inferred. When calling `CallJS` with an explicit function name, you must use the **named parameter** `funcName:` (see [CallJS: explicit vs inferred name](#calljs-explicit-vs-inferred-name) below):
+**Explicit names:** JS names can be specified explicitly instead of being inferred; the name you pass is used as given (casing preserved). When calling `CallJS` with an explicit function name, you must use the **named parameter** `funcName:` and similarly `propertyName:` for SetJSProperty. (see [CallJS: explicit vs inferred name](#calljs-explicit-vs-inferred-name) below):
 
 ```csharp
 public HtmlElement Head => this.GetJSProperty<HtmlElement>("head");
@@ -205,9 +218,6 @@ public string TextContent {
 public void SetAttribute(string name, string value) 
   => this.CallJS(funcName: "setAttribute", name, value);
 ```
-
-> [!NOTE] 
-> **Pitfall:** When specifying explicit property name for SetJSProperty, then the value comes first with the property name second.
 
 ### Operating on JSObject
 

@@ -12,18 +12,29 @@ internal static class JSImportInstanceHelpers
 {
 
     // J can be JSObject, primitive, or IJSObjectWrapper<J>
-    public static J GetProperty<J>(JSObject jsObject, string propertyName)
+    public static J GetProperty<J>(JSObject jsObject, string propertyName, bool applyJSCasing = true)
     {
-        object? genericObject = InstanceHelperJS.PropertyByNameToObject(jsObject, ToJSCasing(propertyName));
+        var name = applyJSCasing ? ToJSCasing(propertyName) : propertyName;
+        object? genericObject = InstanceHelperJS.PropertyByNameToObject(jsObject, name);
         return CastOrWrap<J>(genericObject);
     }
 
-    public static void SetProperty(JSObject jsObject, string propertyName, object value)
-        => InstanceHelperJS.SetPropertyByName(jsObject, ToJSCasing(propertyName), value);
+    public static void SetProperty(JSObject jsObject, string propertyName, object value, bool applyJSCasing = true)
+    {
+        var name = applyJSCasing ? ToJSCasing(propertyName) : propertyName;
+        InstanceHelperJS.SetPropertyByName(jsObject, name, value);
+    }
 
     // J should be a JSObject, IJSObjectWrapper<J>, or other primitive JS type
     public static J CallJSFunc<J>(JSObject jsObject, string funcName, params object[] parameters)
+        => CallJSFuncInternal<J>(jsObject, funcName, applyJSCasing: true, parameters);
+
+    public static J CallJSFuncExplicitName<J>(JSObject jsObject, string funcName, params object[] parameters)
+        => CallJSFuncInternal<J>(jsObject, funcName, applyJSCasing: false, parameters);
+
+    private static J CallJSFuncInternal<J>(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
     {
+        var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
         object[] objs = UnwrapJSObjectParams(parameters);
         object? genericObject;
         Type type = typeof(J);
@@ -32,14 +43,14 @@ internal static class JSImportInstanceHelpers
             switch (type.GetElementType())
             {
                 case Type t when t == typeof(string):
-                    genericObject = InstanceHelperJS.FuncByNameAsStringArray(jsObject, ToJSCasing(funcName), objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsStringArray(jsObject, name, objs);
                     return (J)genericObject;
                 case Type t when t == typeof(double):
-                    genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, ToJSCasing(funcName), objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, name, objs);
                     return (J)genericObject;
-                    
+
                 case Type t when t == typeof(JSObject): // JSObject[] array
-                    genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, ToJSCasing(funcName), objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objs);
                     var array = (object[])genericObject;
                     return (J)(object)(array.Cast<JSObject>().ToArray());
                 default:
@@ -48,16 +59,23 @@ internal static class JSImportInstanceHelpers
         }
         else
         {
-            genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, ToJSCasing(funcName), objs);
+            genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objs);
         }
 
         return CastOrWrap<J>(genericObject);
     }
 
     public static void CallJSFuncVoid(JSObject jsObject, string funcName, params object[] parameters)
+        => CallJSFuncVoidInternal(jsObject, funcName, applyJSCasing: true, parameters);
+
+    public static void CallJSFuncVoidExplicitName(JSObject jsObject, string funcName, params object[] parameters)
+        => CallJSFuncVoidInternal(jsObject, funcName, applyJSCasing: false, parameters);
+
+    private static void CallJSFuncVoidInternal(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
     {
+        var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
         object[] objs = UnwrapJSObjectParams(parameters);
-        InstanceHelperJS.FuncByNameVoid(jsObject, ToJSCasing(funcName), objs);
+        InstanceHelperJS.FuncByNameVoid(jsObject, name, objs);
     }
 
     // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
@@ -175,8 +193,7 @@ internal static class JSImportInstanceHelpers
         return null;
     }
 
-    // TODO: Add option to suppress casing adjustments
-    // lower cases first character
+    // Lower-cases first character for JS lowerCamelCase. Use CallJSFuncExplicitName/CallJSFuncVoidExplicitName or SetProperty(..., applyJSCasing: false) to preserve caller casing.
     public static string ToJSCasing(string identifier)
         => Char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);
 }
