@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	  <AssemblyName>SerratedSharp.SerratedJSInterop.Tests.BlazorWasm</AssemblyName>
 	  <RootNamespace>SerratedSharp.SerratedJSInterop.Tests.BlazorWasm</RootNamespace>
+    <!-- AOT and trimming run only on publish (not on build). Validate with: dotnet publish -c Release -->
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <PublishTrimmed>true</PublishTrimmed>
+    <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
