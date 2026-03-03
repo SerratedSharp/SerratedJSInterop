@@ -2,6 +2,7 @@
 
 namespace SerratedSharp.SerratedJSInterop;
 
+using System.Diagnostics.CodeAnalysis;
 using SerratedSharp.SerratedJSInterop.Internal;
 using System;
 using System.Reflection;
@@ -10,9 +11,14 @@ using System.Runtime.InteropServices.JavaScript;
 
 internal static class JSImportInstanceHelpers
 {
+    /// <summary>Used by extension methods that call into CastOrWrap/GetProperty/CallJSFunc so their generic J matches trimmer requirements.</summary>
+    internal const DynamicallyAccessedMemberTypes WrapperTypeMembers =
+        DynamicallyAccessedMemberTypes.PublicMethods
+        | DynamicallyAccessedMemberTypes.NonPublicMethods
+        | DynamicallyAccessedMemberTypes.Interfaces;
 
     // J can be JSObject, primitive, or IJSObjectWrapper<J>
-    public static J GetProperty<J>(JSObject jsObject, string propertyName, bool applyJSCasing = true)
+    public static J GetProperty<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string propertyName, bool applyJSCasing = true)
     {
         var name = applyJSCasing ? ToJSCasing(propertyName) : propertyName;
         object? genericObject = InstanceHelperJS.PropertyByNameToObject(jsObject, name);
@@ -26,13 +32,13 @@ internal static class JSImportInstanceHelpers
     }
 
     // J should be a JSObject, IJSObjectWrapper<J>, or other primitive JS type
-    public static J CallJSFunc<J>(JSObject jsObject, string funcName, params object[] parameters)
+    public static J CallJSFunc<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string funcName, params object[] parameters)
         => CallJSFuncInternal<J>(jsObject, funcName, applyJSCasing: true, parameters);
 
-    public static J CallJSFuncExplicitName<J>(JSObject jsObject, string funcName, params object[] parameters)
+    public static J CallJSFuncExplicitName<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string funcName, params object[] parameters)
         => CallJSFuncInternal<J>(jsObject, funcName, applyJSCasing: false, parameters);
 
-    private static J CallJSFuncInternal<J>(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
+    private static J CallJSFuncInternal<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
     {
         var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
         object[] objs = UnwrapJSObjectParams(parameters);
@@ -79,7 +85,7 @@ internal static class JSImportInstanceHelpers
     }
 
     // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
-    internal static J CastOrWrap<J>(object? genericObject)
+    internal static J CastOrWrap<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(object? genericObject)
     {
         Type type = typeof(J);
 
@@ -175,14 +181,19 @@ internal static class JSImportInstanceHelpers
     
     // Returns IJSObjectWrapper&lt;T&gt; if type T implements it (i.e. T : IJSObjectWrapper<T>); otherwise null.
     // Avoids MakeGenericType with types that don't satisfy the constraint (e.g. JSObject, primitives).
-    private static Type? TryGetIJSObjectWrapperOfSelf(Type type)
+    [return: DynamicallyAccessedMembers(WrapperTypeMembers)]
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2073",
+        Justification = "Returned Type is one of type.GetInterfaces(); type is annotated with WrapperTypeMembers.")]
+    private static Type? TryGetIJSObjectWrapperOfSelf([DynamicallyAccessedMembers(WrapperTypeMembers)] Type type)
     {
         if (!typeof(IJSObjectWrapper).IsAssignableFrom(type))
             return null;
 
         Type openGeneric = typeof(IJSObjectWrapper<>);
-        foreach (Type iface in type.GetInterfaces())
+        Type[] interfaces = type.GetInterfaces();
+        for (int i = 0; i < interfaces.Length; i++)
         {
+            Type iface = interfaces[i];
             if (iface.IsGenericType && iface.GetGenericTypeDefinition() == openGeneric)
             {
                 Type[] args = iface.GetGenericArguments();

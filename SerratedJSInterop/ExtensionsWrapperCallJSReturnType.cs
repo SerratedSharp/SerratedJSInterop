@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using SerratedSharp.SerratedJSInterop.Internal;
 using System.Runtime.CompilerServices;
 
@@ -9,7 +10,7 @@ namespace SerratedSharp.SerratedJSInterop;
 public static class WrapperCallJSReturnTypeExtensions
 {
 
-    #region Overloads of inferred name CallJS<J> for 0 thru 5 parameters
+    #region Overloads of inferred name CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J> for 0 thru 5 parameters
 
     /// <summary>
     /// <para>Call JS <c>funcName</c>(inferred via [CallerMemberName]) on this IJSObjectWrapper's JSObject.</para>
@@ -19,7 +20,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="wrapper">The wrapper whose JSObject to invoke funcName on.</param>
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!);
 
     /// <summary>
@@ -32,7 +33,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(1)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, object param1, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, object param1, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, param1);
 
     /// <summary>
@@ -46,7 +47,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(1)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, object param1, object param2, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, object param1, object param2, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, param1, param2);
 
     /// <summary>
@@ -61,7 +62,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(1)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, param1, param2, param3);
 
     /// <summary>
@@ -77,7 +78,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(1)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, object param4, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, object param4, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, param1, param2, param3, param4);
 
     /// <summary>
@@ -94,7 +95,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(1)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, object param4, object param5, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, object param1, object param2, object param3, object param4, object param5, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, param1, param2, param3, param4, param5);
 
     #endregion
@@ -124,7 +125,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="parameters">SerratedJS.JSParams bundle to pass to the JS function.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(20)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, string funcName, JSParams parameters)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, string funcName, JSParams parameters)
         => JSImportInstanceHelpers.CallJSFuncExplicitName<J>(wrapper.JSObject, funcName, parameters.Args);
 
     /// <summary>
@@ -138,7 +139,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with casing preserved.</param>
     /// <param name="parameters">Arguments to pass to the JS function.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, string funcName, params object[] parameters)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, string funcName, params object[] parameters)
         => JSImportInstanceHelpers.CallJSFuncExplicitName<J>(wrapper.JSObject, funcName, parameters);
 
     // CONSIDER: Overloads for string and int arrays, and any other array types that get unintentionally multiplexed by `params`. This may already be solved by Serrated.JSParams.ArrayParam
@@ -155,7 +156,7 @@ public static class WrapperCallJSReturnTypeExtensions
     /// <param name="funcName">Name of the JS function on this wrapper's <c>JSObject</c> to call, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The JS call's return, casted or wrapped to requested type <c>J</c>.</returns>
     [OverloadResolutionPriority(20)]
-    public static J CallJS<J>(this IJSObjectWrapper wrapper, JSParams parameters, Breaker _ = default, [CallerMemberName] string? funcName = null)
+    public static J CallJS<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, JSParams parameters, Breaker _ = default, [CallerMemberName] string? funcName = null)
         => JSImportInstanceHelpers.CallJSFunc<J>(wrapper.JSObject, funcName!, parameters.Args);
 
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 
@@ -14,7 +15,7 @@ public static class ExtensionsJSObjectProperty
     /// <param name="jsObject">Reference to the JS instance to read the property from.</param>
     /// <param name="propertyName">Name of the property on this <c>jsObject</c> to get.  Omit to infer from [CallerMemberName], with first letter lower cased for JS casing conventions.</param>
     /// <returns>The property value, casted or wrapped to requested type <c>J</c>.</returns>
-    public static J GetJSProperty<J>(this JSObject jsObject, [CallerMemberName] string? propertyName = null)
+    public static J GetJSProperty<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this JSObject jsObject, [CallerMemberName] string? propertyName = null)
         => JSImportInstanceHelpers.GetProperty<J>(jsObject, propertyName!);
 
     // this.SetJSProperty("someProperty", "value");
