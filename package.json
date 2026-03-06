@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "pack:release": "dotnet pack SerratedJSInterop.sln -c Release -o nugetpackout",
-    "pack:debug": "dotnet pack SerratedJSInterop.sln -c Debug -o nugetpackout"
+    "pack:debug": "dotnet pack SerratedJSInterop.sln -c Debug -o nugetpackout",
+    "publish:BlazorWasm": "dotnet publish SerratedJSInterop.Tests.BlazorWasm\\SerratedJSInterop.Tests.BlazorWasm.csproj -c Release -o publish\\BlazorWasm",
+    "publish:WasmBrowser": "dotnet publish SerratedJSInterop.Tests.WasmBrowser\\0SerratedJSInterop.Tests.WasmBrowser.csproj -c Release -o publish\\WasmBrowser",
+    "launchPublished:BlazorWasm": "dotnet serve -o -d publish\\BlazorWasm\\wwwroot",
+    "launchPublished:WasmBrowser": "dotnet serve -o -d publish\\WasmBrowser\\AppBundle"
   }
 }

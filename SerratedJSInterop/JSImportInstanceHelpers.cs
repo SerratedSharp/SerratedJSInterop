@@ -5,8 +5,8 @@ namespace SerratedSharp.SerratedJSInterop;
 using System.Diagnostics.CodeAnalysis;
 using SerratedSharp.SerratedJSInterop.Internal;
 using System;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 
 internal static class JSImportInstanceHelpers
@@ -42,23 +42,22 @@ internal static class JSImportInstanceHelpers
     {
         var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
         object[] objs = UnwrapJSObjectParams(parameters);
-        object? genericObject;
+        object? genericObject = null;
         Type type = typeof(J);
+
         if (type.IsArray)
         {
             switch (type.GetElementType())
             {
                 case Type t when t == typeof(string):
                     genericObject = InstanceHelperJS.FuncByNameAsStringArray(jsObject, name, objs);
-                    return (J)genericObject;
+                    break;
                 case Type t when t == typeof(double):
                     genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, name, objs);
-                    return (J)genericObject;
-
-                case Type t when t == typeof(JSObject): // JSObject[] array
+                    break;
+                case Type t when t == typeof(JSObject):
                     genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objs);
-                    var array = (object[])genericObject;
-                    return (J)(object)(array.Cast<JSObject>().ToArray());
+                    break;
                 default:
                     throw new NotImplementedException($"CallJSFunc: Returning array of {type.GetElementType()} not implemented");
             }
@@ -84,127 +83,156 @@ internal static class JSImportInstanceHelpers
         InstanceHelperJS.FuncByNameVoid(jsObject, name, objs);
     }
 
-    // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using WrapInstance.
+    // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using the cached WrapInstance delegate.
     internal static J CastOrWrap<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(object? genericObject)
     {
-        Type type = typeof(J);
+        if (genericObject is null)
+            return default!;
 
-        // Check if J implements IJSObjectWrapper<J> (only valid when J is a wrapper type; J may be JSObject or primitive)
-        Type? wrapperInterface = TryGetIJSObjectWrapperOfSelf(type);
-        if (wrapperInterface != null)
+        try
         {
-            if (genericObject is JSObject jsObj)
+            Type type = typeof(J);
+
+            // Array types: convert object[] from interop to string[], double[], or JSObject[] as requested.
+            if (type.IsArray)
             {
-                var wrapMethod = type.GetMethod("WrapInstance",
-                    BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-
-                if (wrapMethod != null)
+                Type elementType = type.GetElementType()!;
+                if (genericObject is object[] objArray)
                 {
-                    return (J)wrapMethod.Invoke(null, new object[] { jsObj })!;
+                    if (elementType == typeof(string))
+                        return (J)(object)Array.ConvertAll(objArray, o => o?.ToString() ?? "");
+                    if (elementType == typeof(double))
+                        return (J)(object)Array.ConvertAll(objArray, o => o is double d ? d : Convert.ToDouble(o));
+                    if (elementType == typeof(JSObject))
+                        return (J)(object)objArray.Cast<JSObject>().ToArray();
+                    throw new NotImplementedException($"CastOrWrap: Array of {elementType} not implemented");
                 }
+                return (J)genericObject!; // already string[] or double[] from typed interop
+            }
 
-                // Fallback: try explicit interface implementation
-                var interfaceMap = type.GetInterfaceMap(wrapperInterface);
-                for (int i = 0; i < interfaceMap.InterfaceMethods.Length; i++)
+            // If J implements IJSObjectWrapper<J> and we have a JSObject, wrap it via cached delegate
+            if (genericObject is JSObject jsObj && WrapperInvoker<J>.Wrap != null)
+                return WrapperInvoker<J>.Wrap(jsObj);
+
+            // JS interop often returns numbers as double; unboxing (int)(object)boxedDouble throws.
+            if (type.IsValueType && !type.IsEnum)
+            {
+                TypeCode code = Type.GetTypeCode(type);
+                if (code >= TypeCode.SByte && code <= TypeCode.Decimal)
                 {
-                    if (interfaceMap.InterfaceMethods[i].Name == "WrapInstance")
+                    try
                     {
-                        return (J)interfaceMap.TargetMethods[i].Invoke(null, new object[] { jsObj })!;
+                        return (J)Convert.ChangeType(genericObject, type);
+                    }
+                    catch (InvalidCastException) { /* fall through to direct cast */ }
+                }
+            }
+
+            return (J)genericObject!;
+        }
+        catch (InvalidCastException ex)
+        {
+            string sourceTypeName = genericObject?.GetType().FullName ?? "null";
+            string targetTypeName = typeof(J).FullName ?? typeof(J).Name;
+            throw new InvalidCastException(
+                $"Failure to coerce type returned from JS interop, from ({sourceTypeName}) into ({targetTypeName}). See inner exception for details.",
+                ex);
+        }
+    }
+
+    /// <summary>
+    /// Per-type cached delegate for calling IJSObjectWrapper&lt;T&gt;.WrapInstance.
+    /// Reflection runs once per T when the static field initializes; all subsequent calls use the fast delegate.
+    /// </summary>
+    private static class WrapperInvoker<[DynamicallyAccessedMembers(WrapperTypeMembers)] T>
+    {
+        internal static readonly Func<JSObject, T>? Wrap = ResolveWrapper();
+
+        [UnconditionalSuppressMessage("Trimming", "IL2060",
+            Justification = "MakeGenericMethod is called with a type verified at runtime to satisfy IJSObjectWrapper<T>; T is annotated with WrapperTypeMembers.")]
+        [UnconditionalSuppressMessage("Trimming", "IL2070",
+            Justification = "T is annotated with WrapperTypeMembers which preserves Interfaces and Methods.")]
+        private static Func<JSObject, T>? ResolveWrapper()
+        {
+            Type type = typeof(T);
+            if (!typeof(IJSObjectWrapper).IsAssignableFrom(type))
+                return null;
+
+            Type openGeneric = typeof(IJSObjectWrapper<>);
+            Type[] interfaces = type.GetInterfaces();
+            for (int i = 0; i < interfaces.Length; i++)
+            {
+                Type iface = interfaces[i];
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == openGeneric)
+                {
+                    Type[] args = iface.GetGenericArguments();
+                    if (args.Length == 1 && args[0] == type)
+                    {
+                        // T implements IJSObjectWrapper<T>. Create a cached delegate that calls
+                        // the constrained TWrapper.WrapInstance via MakeGenericMethod bridge.
+                        MethodInfo openMethod = typeof(WrapperInvoker<T>)
+                            .GetMethod(nameof(CallWrapInstance), BindingFlags.NonPublic | BindingFlags.Static)!;
+                        MethodInfo closedMethod = openMethod.MakeGenericMethod(type);
+                        return (Func<JSObject, T>)Delegate.CreateDelegate(typeof(Func<JSObject, T>), closedMethod);
                     }
                 }
             }
-
-            // If genericObject is null or not a JSObject, return default
-            return default!;
+            return null;
         }
 
-        // JS interop often returns numbers as double; unboxing (int)(object)boxedDouble throws.
-        if (genericObject != null && type.IsValueType && !type.IsEnum)
+        // Constrained bridge: the compiler can resolve TWrapper.WrapInstance here because of the constraint.
+        // Called indirectly via the cached delegate created by ResolveWrapper.
+        private static TWrapper CallWrapInstance<TWrapper>(JSObject jsObj)
+            where TWrapper : IJSObjectWrapper<TWrapper>
         {
-            TypeCode code = Type.GetTypeCode(type);
-            if (code >= TypeCode.SByte && code <= TypeCode.Decimal)
-            {
-                try
-                {
-                    return (J)Convert.ChangeType(genericObject, type);
-                }
-                catch (InvalidCastException) { /* fall through to direct cast */ }
-            }
+            return TWrapper.WrapInstance(jsObj);
         }
-
-        return (J)genericObject!;
     }
 
     public static object[] UnwrapJSObjectParams(object[] parameters)
     {
-        if(parameters == null)
+        if (parameters == null)
             return Array.Empty<object>();
 
-        // New param array with unwrapped JSOBjects if wrappers are found.  Only create array if/when we encounter first wrapper
+        // New param array with unwrapped JSObjects if wrappers are found. Only create array if/when we encounter first wrapper.
         object[]? objs = null;
         for (int i = 0; i < parameters.Length; i++)
         {
             object param = parameters[i];
             if (param is IJSObjectWrapper wrapper)
             {
-                // if first wrapper encountered, copy array up till this point
                 if (objs == null)
                     objs = TypedArrayToObjectArray(parameters, i);
 
-                objs[i] = wrapper.JSObject; // unwrap
+                objs[i] = wrapper.JSObject;
             }
-            else if (objs != null) // if we created new array for unwrapping 
+            else if (objs != null)
             {
-                // then finish copying any normal params into remainder of new array
                 objs[i] = param;
             }
         }
-        if (objs == null)
-            objs = parameters;
-        return objs;
+        return objs ?? parameters;
     }
 
     private static object[] TypedArrayToObjectArray(object[] objs, int index)
     {
         if (objs.GetType().GetElementType() == typeof(object))
-        {
             return objs;
-        }
-        else
-        {            
-            object[] objs2 = new object[objs.Length];
-            Array.Copy(objs, objs2, index + 1);
-            return objs2;
-        }
+
+        object[] objs2 = new object[objs.Length];
+        Array.Copy(objs, objs2, index + 1);
+        return objs2;
     }
 
     
-    // Returns IJSObjectWrapper&lt;T&gt; if type T implements it (i.e. T : IJSObjectWrapper<T>); otherwise null.
-    // Avoids MakeGenericType with types that don't satisfy the constraint (e.g. JSObject, primitives).
-    [return: DynamicallyAccessedMembers(WrapperTypeMembers)]
-    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2073",
-        Justification = "Returned Type is one of type.GetInterfaces(); type is annotated with WrapperTypeMembers.")]
-    private static Type? TryGetIJSObjectWrapperOfSelf([DynamicallyAccessedMembers(WrapperTypeMembers)] Type type)
-    {
-        if (!typeof(IJSObjectWrapper).IsAssignableFrom(type))
-            return null;
-
-        Type openGeneric = typeof(IJSObjectWrapper<>);
-        Type[] interfaces = type.GetInterfaces();
-        for (int i = 0; i < interfaces.Length; i++)
-        {
-            Type iface = interfaces[i];
-            if (iface.IsGenericType && iface.GetGenericTypeDefinition() == openGeneric)
-            {
-                Type[] args = iface.GetGenericArguments();
-                if (args.Length == 1 && args[0] == type)
-                    return iface;
-            }
-        }
-        return null;
-    }
-
-    // Lower-cases first character for JS lowerCamelCase. Use CallJSFuncExplicitName/CallJSFuncVoidExplicitName or SetProperty(..., applyJSCasing: false) to preserve caller casing.
     public static string ToJSCasing(string identifier)
-        => Char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);
+    {
+        if (string.IsNullOrEmpty(identifier))
+            return identifier;
+
+        if (identifier.Length == 1)
+            return char.ToLowerInvariant(identifier[0]).ToString();
+        // Lower-cases first character for JS lowerCamelCase.
+        return char.ToLowerInvariant(identifier[0]) + identifier.Substring(1);
+    }
 }
