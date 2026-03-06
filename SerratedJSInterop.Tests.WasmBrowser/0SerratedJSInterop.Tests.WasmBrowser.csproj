@@ -3,6 +3,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
+    <!-- AOT and trimming run only on publish (not on build). Validate with: dotnet publish -c Release -->
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <PublishTrimmed>true</PublishTrimmed>
+    <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SerratedJSInterop\SerratedJSInterop.csproj" />

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace SerratedSharp.SerratedJSInterop;
@@ -12,7 +13,7 @@ public static class WrapperPropertyExtensions
     /// <param name="wrapper">The wrapper whose JSObject to read the property from.</param>
     /// <param name="propertyName">Name of the property on this wrapper's <c>JSObject</c> to get, with first letter lower cased for JS casing conventions.</param>
     /// <returns>The property value, casted or wrapped to requested type <c>J</c>.</returns>
-    public static J GetJSProperty<J>(this IJSObjectWrapper wrapper, [CallerMemberName] string? propertyName = null)
+    public static J GetJSProperty<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] J>(this IJSObjectWrapper wrapper, [CallerMemberName] string? propertyName = null)
         => JSImportInstanceHelpers.GetProperty<J>(wrapper.JSObject, propertyName!);
 
     /// <summary>
