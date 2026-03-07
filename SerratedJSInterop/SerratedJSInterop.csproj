@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -10,17 +10,17 @@
     <Authors>SerratedSharpSolutions</Authors>
     <Company>SerratedSharpSolutions</Company>
     <Description>
-		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop. Simplifies interop by reducing amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
+		Reduces or eliminates need for explicit JavaScript shims and [JSImport] declarations when using the [JSImport]/System.Runtime.InteropServices.JavaScript flavor of .NET/JavaScript interop. Simplifies interop by reducing the amount of boilerplate code needed when implementing JavaScript type wrappers or calling native JavaScript.
 	</Description>
     <Copyright>Copyright (c) SerratedSharpSolutions 2026</Copyright>
     <PackageTags>WebAssembly; Blazor; JSInterop; JSImport; WasmBrowser</PackageTags>
-            <Version>0.3.2</Version>
-    <AssemblyVersion>0.3.2.0</AssemblyVersion>
-        <FileVersion>0.3.2.0</FileVersion>
+            <Version>0.3.3</Version>
+    <AssemblyVersion>0.3.3.0</AssemblyVersion>
+        <FileVersion>0.3.3.0</FileVersion>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <AssemblyName>SerratedSharp.SerratedJSInterop</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageLicenseFile />
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/SerratedSharp/SerratedJSInterop</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SerratedSharp/SerratedJSInterop/tree/main/SerratedJSInterop</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" Link="readme.md" />
+    <None Include="LICENSE.txt" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
