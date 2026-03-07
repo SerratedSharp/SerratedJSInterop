@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\" Link="readme.md" />
+    <None Include="..\README.md" Pack="true" PackagePath="readme.md" Link="readme.md" />
     <None Include="..\SerratedJSInterop\LICENSE.txt" Pack="true" PackagePath="\" Link="LICENSE.txt" />
   </ItemGroup>
 

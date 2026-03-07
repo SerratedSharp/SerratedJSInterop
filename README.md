@@ -2,8 +2,6 @@
 
 A library to simplify .NET WebAssembly interop with JavaScript when using `System.Runtime.InteropServices.JavaScript` and [JSImport]. It reduces or eliminates the need for explicit JavaScript shims and per-method [JSImport] declarations. This eases adhoc JS interop and reduces boilerplate code for C# wrappers.
 
-> **Work in progress:** The API is being refined and will be published to NuGet when ready.
-
 ## Brief Example
 
 This example demonstrates wrapping a JS type which performs interop for methods and properties.  This allows the creation of clean wrappers for JS types/libraries with minimal effort: 

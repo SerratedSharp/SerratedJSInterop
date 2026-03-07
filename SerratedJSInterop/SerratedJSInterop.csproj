@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -29,11 +29,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\" Link="readme.md" />
+    <None Include="..\README.md" Pack="true" PackagePath="readme.md" Link="readme.md" />
     <None Include="LICENSE.txt" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
+  
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
