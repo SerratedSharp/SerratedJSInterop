@@ -32,9 +32,10 @@ following terms apply to that version:
    entities, or authorized resellers, or you must refrain from production
    use.
 
-3. After the Change Date. Effective on the third anniversary of the
-   Change Date for a given version, Licensor grants you the rights set
-   out in the MIT License below for that version of the Licensed Work.
+3. After the third anniversary of the Change Date. Effective on the
+   third anniversary of the Change Date for a given version, Licensor
+   grants you the rights set out in the MIT License below for that
+   version of the Licensed Work.
 
 4. Scope. All copies and derivative works of the Licensed Work are
    subject to this License. This License applies separately for each
@@ -58,7 +59,7 @@ following terms apply to that version:
    PURPOSE, NON-INFRINGEMENT, AND TITLE.
 
 ================================================================================
-MIT LICENSE (EFFECTIVE FROM CHANGE DATE)
+MIT LICENSE (EFFECTIVE 3 YEARS FROM CHANGE DATE)
 ================================================================================
 
 From the third anniversary of the Change Date for a given version, that
