@@ -46,7 +46,7 @@ public class Audio : IJSObjectWrapper<Audio>
     // Map return to a native JSObject instead of requesting a wrapped type
     public JSObject CaptureStream() => this.CallJS<JSObject>();
         
-    // IJSObjectWrapper<Audio> utility method that allows library to auto-wrap JSObject's as requested.
+    // IJSObjectWrapper<Audio> utility method that allows library to auto-wrap JSObject references as requested.
     // Permits other methods to return this type such as GetJSProperty<Audio>() or CallJS<Audio>()
     static Audio IJSObjectWrapper<Audio>.WrapInstance(JSObject jsObject) => new Audio(jsObject);
 }
@@ -120,10 +120,11 @@ There are two main ways to use SerratedJSInterop: wrapping a JS type with C# cla
 
 ### Instance Wrapper
 
-- Implement `IJSObjectWrapper<YourType>` and expose a `JSObject`. 
+- Implement `IJSObjectWrapper<YourType>` and expose a `JSObject` property. 
 - Implement the required static WrapInstance method, which is leveraged by the library to automatically wrap returned instances for calls such as `CallJS<YourType>()`.
-- Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments. 
+- Use `SerratedJS.New("JsTypeName")` for parameterless construction, `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments, or omit the constructor if this type is typically not constructed directly but retrieved via other methods(HTMLElement for example). 
 - Use `this.GetJSProperty<T>()`, `this.SetJSProperty(value)`, `this.CallJS<T>(...)`, and `this.CallJS(...)` to map properties/methods to the underlying JSObject reference.
+- **CONSIDER:** Implementing a constructor taking a JSObject as shown below, ensuring a caller can wrap a JSObject reference obtained through other means.
 
 ```csharp
 public class Image : IJSObjectWrapper<Image>
@@ -324,6 +325,168 @@ This does not require an extra roundtrip. The payload is serialized in .NET and 
 
 Note JSObject references would not be preserved across such deserialization.  This approach is only appropriate for data-only objects where the properties are primitives or simple serializable types.  For objects with JSObject references, it's recommended to define a wrapper type and use the standard interop patterns.
 
+### Callbacks
+
+Pass C# delegates (or a **CallbackHandle**) to JS as arguments to `CallJS` / `CallJS<T>()` or as the value in `SetJSProperty`. The library detects `Action`, `Action<JSObject>`, `Callback`, and `CallbackHandle` and invokes your delegate when JS calls back. The event argument is a `JSObject` you can read with interop (e.g. `GetJSProperty`).
+
+**Example: click handler that uses the event (e.g. PointerEvent)**
+
+```csharp
+var doc = Document.GetDocument();
+var button = doc.CreateElement("button").JSObject;
+
+button.SetJSProperty(propertyName: "onclick", (Action<JSObject>)(e =>
+{
+    // e is the event (e.g. PointerEvent); read properties via interop
+    var clientX = e.GetJSProperty<double>("clientX");
+    var type = e.GetJSProperty<string>("type");
+    GlobalJS.Console.Log("click", type, clientX);
+}));
+
+button.CallJS(funcName: "click");   // programmatic click
+// Later: button.SetJSProperty(propertyName: "onclick", null!);  // clear
+```
+
+> Note: Action delegates must be explicitly declared with `Action` or `Action<parameType>` since we cannot infer the parameter types across the interop boundary. Implicitly typed lambdas are not supported.
+
+#### Callback With No Parameters (`Action`)
+
+Consider this JavaScript assigning a callback handler via a property:
+
+```javascript
+button.onclick = function() { console.log("clicked"); };
+```
+
+The equivalent C#/JS interop declares a C# Action with no parameters as the handler for the callback, and passes it as a parameter via SetJSProperty:
+
+```csharp
+button.SetJSProperty(propertyName: "onclick", 
+  (Action)(() => {
+    GlobalJS.Console.Log("clicked");
+  })
+);
+```
+
+If the callback handler is added via a JS method call,
+
+```javascript
+button.addEventListener("click", 
+  function() { 
+    console.log("clicked"); 
+  }
+);
+```
+
+... then use CallJS, passing the callback handler to the corresponding positional parameter.  This also demonstrates an alternative syntax where the handler is declared seperately before being passed to the subscription call:
+
+```csharp
+Action<JSObject> handler = e => {
+  GlobalJS.Console.Log("clicked");
+};
+
+button.CallJS(funcName: "addEventListener", "click", handler);
+```
+
+#### Single-Argument Callback (`Action<JSObject>`)
+
+Consider a JavaScript callback taking a single parameter:
+
+```javascript
+button.addEventListener("click", function(event) {
+    console.log(event.type, event.clientX);
+});
+```
+
+The equivalent C#/JS interop declares a `Action<JSObject>` handler:
+
+```csharp
+Action<JSObject> handler = e =>
+{
+  var type = e.GetJSProperty<string>("type");
+  var clientX = e.GetJSProperty<double>("clientX");
+  GlobalJS.Console.Log(type, clientX);
+};
+
+button.CallJS(funcName: "addEventListener", "click", handler);
+```
+
+#### Multiple Callback Parameters
+
+For callbacks with multiple parameters, use
+`Callback.Create<T1, T2, ...>` (up to 4 type parameters).
+
+The library coerces each parameter to the requested type (for example JS `number` to C# `int`):
+
+```csharp
+emitter.SetJSProperty(propertyName: "ondata",
+    Callback.Create<JSObject, int, string>((sender, statusCode, context) =>
+    {
+        GlobalJS.Console.Log(sender, statusCode, context);
+    }));
+```
+
+If you need full control or more than 4 arguments, use the low-level `PackedParams` path via `Callback.CreatePacked(Action<PackedParams>)`:
+
+```csharp
+emitter.SetJSProperty(propertyName: "ondata", Callback.CreatePacked(packed =>
+{
+    object[] args = packed.GetUnpacked();
+    int statusCode = Convert.ToInt32(args[1]);
+    GlobalJS.Console.Log(args[0], statusCode, args[2]);
+}));
+```
+
+#### Callback Handle (`CallbackHandle`)
+
+Wrap a delegate once with `Callback.MarshalAsHandle(...)` and reuse the same handle for add/remove without re-wrapping. Optional **context** (`JSObject`) applies `.bind(context)` on the JS side.
+
+To implement interop equivalent to the following JavaScript registering and later unregistering the same function reference:
+
+```javascript
+function handler(e) { console.log(e.type); }
+element.addEventListener("click", handler);
+// ...later:
+element.removeEventListener("click", handler);
+```
+
+... create a `CallbackHandle` once, then pass it to CallJS for both add and remove:
+
+```csharp
+CallbackHandle handle = Callback.MarshalAsHandle(
+    (Action<JSObject>)(e => GlobalJS.Console.Log(e.GetJSProperty<string>("type"))));
+element.CallJS(funcName: "addEventListener", "click", handle);
+// ...later:
+element.CallJS(funcName: "removeEventListener", "click", handle);
+```
+
+All three delegate types have `MarshalAsHandle` overloads:
+
+```csharp
+CallbackHandle h1 = Callback.MarshalAsHandle(() => count++);                    // Action
+CallbackHandle h2 = Callback.MarshalAsHandle((Action<JSObject>)(_ => count++)); // Action<JSObject>
+CallbackHandle h3 = Callback.MarshalAsHandle(                                   // Callback (typed)
+    Callback.Create<int, string>((id, name) => { }));
+CallbackHandle h4 = Callback.MarshalAsHandle(                                   // Callback (untyped)
+    Callback.CreatePacked(packed => { var args = packed.GetUnpacked(); }));
+CallbackHandle h5 = Callback.MarshalAsHandle(                                   // with context
+    (Action<JSObject>)(e => { }), context: someJSObject);
+```
+
+When you register a callback via a **method** (e.g. `add(callback)`), the call can return a **handler** (`JSObject`) to pass to the corresponding remove method. When you set a **property** (e.g. `onclick`), set it to `null` to clear.
+
+```csharp
+// add/remove style: delegate or handle
+JSObject handler = target.CallJS<JSObject>(funcName: "add", (Action<JSObject>)(_ => count++));
+target.CallJS(funcName: "fire", target.JSObject);
+target.CallJS(funcName: "remove", handler);
+
+// Or with a handle (same handle used for remove)
+CallbackHandle handle = Callback.MarshalAsHandle((Action<JSObject>)(_ => count++));
+target.CallJS(funcName: "add", handle);
+target.CallJS(funcName: "remove", handle);
+```
+
+
 ### Singleton
 
 There are different approaches to implementing singletons or static interop wrappers, depending on the preference of the implementor.  The below demonstrates a combination of approaches.  The type could either be accessed statically via `Document.GetDocument()` or registered with DI of choice to be injected as/where needed.  
@@ -378,3 +541,22 @@ _(Release notes will be added here when the library is published to NuGet.)_
 
 
 This project is a migration of SerratedSharp.JSInteropHelpers previously used internally for other projects, with SerratedJSInterop formalized for broader use.
+
+## 0.3.4
+
+Adds support for:
+
+- Callbacks: pass `Action`, `Action<JSObject>`, `Callback`, or `CallbackHandle` to `CallJS` / `CallJS<T>()` or `SetJSProperty`; the library detects these and invokes your delegate when JS calls back. Use typed overloads (`Callback.Create<T1, T2, ...>`) for automatic unpacking and type coercion. Optional `CallbackHandle` via `Callback.MarshalAsHandle` for reusing the same callback (e.g. add/remove).
+
+## 0.3.3
+
+Initial formalized release of SerratedJSInterop, migrated from JSInteropHelpers.  This release includes support for Blazor WASM and WASM Browser workloads.
+Includes support for the following JS interop:
+
+- New constructor via `SerratedJS.New()`
+- Property getters/setters via `GetJSProperty<T>()` and `SetJSProperty()`
+- Method calls via `CallJS<T>()` and `CallJS()`
+- Optional automatic wrapping of returned JSObject references to custom C# wrapper types implementing `IJSObjectWrapper<T>` via the static `WrapInstance()` method.
+- Support for inferred JS member names via `[CallerMemberName]` and explicit JS member names via `funcName:` and `propertyName:` parameters.
+- Support for passing parameters as primitives, JSObject, and IJSObjectWrapper with various overloads to support up to 5 parameters with inferred names and unlimited parameters with explicit names.
+- Support for passing data-only objects via JSON serialization with `MarshalAsJson()`.

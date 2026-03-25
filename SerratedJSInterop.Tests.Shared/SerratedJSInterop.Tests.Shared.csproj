@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,6 +7,7 @@
     <RootNamespace>SerratedSharp.SerratedJSInterop.Tests.Shared</RootNamespace>
     <AssemblyName>SerratedSharp.SerratedJSInterop.Tests.Shared</AssemblyName>
     <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

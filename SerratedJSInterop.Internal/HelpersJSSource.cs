@@ -17,6 +17,11 @@ namespace SerratedSharp.SerratedJSInterop
         [return: AgnosticJSMarshalAs<JSType.Array<JSType.Object>>]
         public static partial JSObject[] GetArrayObjectItems(JSObject jqObject);
 
+        /// <summary>Reads <c>packed.items</c> in JS; use <see cref="GetArrayObjectItems"/> when all elements are <see cref="JSObject"/>.</summary>
+        [AgnosticJSImport("GetPackedCallbackItems")]
+        [return: AgnosticJSMarshalAs<JSType.Array<JSType.Any>>]
+        public static partial object[] GetPackedCallbackItems(JSObject packedObject);
+
         /// <summary>
         /// Marshal a native JavaScript array of objects into a <see cref="JSObject"/> array.
         /// Expects <paramref name="arrayObject"/> to be a real JS array (for example, the result of jQuery.get()).
@@ -35,6 +40,7 @@ namespace SerratedSharp.SerratedJSInterop
     {
         public static partial Task LoadScript(string relativeUrl) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial JSObject[] GetArrayObjectItems(JSObject jqObject) => throw new NotSupportedException("This assembly is for code generation only.");
+        public static partial object[] GetPackedCallbackItems(JSObject packedObject) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial JSObject[] MarshalAsArrayOfObjects(JSObject arrayObject) => throw new NotSupportedException("This assembly is for code generation only.");
         public static partial JSObject ObjectNew(string path, object[] args) => throw new NotSupportedException("This assembly is for code generation only.");
     }

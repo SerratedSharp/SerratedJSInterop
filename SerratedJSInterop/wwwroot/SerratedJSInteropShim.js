@@ -10,6 +10,11 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
         return arrayObject.items;
     }
 
+    // Same body as GetArrayObjectItems; .NET uses [return: JSMarshalAs(JSType.Array(JSType.Any))] for mixed primitives + objects.
+    HelpersShim.GetPackedCallbackItems = function (packed) {
+        return packed.items;
+    };
+
     // Marshal a native JS array of objects into a form that can be returned
     // as JSObject[] on the .NET side. The interop marshaller handles the
     // conversion when used with [return: JSMarshalAs<JSType.Array<JSType.Object>>].
@@ -58,7 +63,6 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
             return value;
         }
     }
-
     // Call constructor with optional arguments.
     HelpersShim.ObjectNew = function (path, args) {
         var constructor = HelpersShim.ResolvePath(path);
@@ -84,6 +88,66 @@ var SerratedJSInteropShim = globalThis.SerratedJSInteropShim || {};
     };
 
     SerratedJSInteropShim.HelpersShim = HelpersShim; // add to parent namespace
+
+    // CallbackShim: wrap .NET callbacks for JS, pass wrapper to target method, return handler for unbind/remove.
+    // Packed object uses { items: args }; C# PackedParams.GetUnpacked reads items as object[] (primitives + objects).
+    // Core behavior: one implementation builds args with handler at callbackParamIndex (like FuncByNameToObject for CallJS).
+    var CallbackShim = SerratedJSInteropShim.CallbackShim || {};
+
+    function buildArgsAndApply(jsObject, funcName, handler, callbackParamIndex, otherParams) {
+        const fn = jsObject?.[funcName];
+        if (typeof fn !== "function") {
+            throw new Error(`"${funcName}" is not a function on target.`);
+        }
+        const n = (otherParams && otherParams.length) ? otherParams.length : 0;
+        const args = new Array(n + 1);
+        for (var i = 0; i < args.length; i++) {
+            if (i === callbackParamIndex) {
+                args[i] = handler;
+            } else {
+                const idx = i < callbackParamIndex ? i : i - 1;
+                args[i] = (otherParams && idx < n) ? unwrapSerratedPocoArg(otherParams[idx]) : undefined;
+            }
+        }
+        return fn.apply(jsObject, args);
+    }
+
+    // Core: callback at any index. isPackedParams: true = handler receives (...args) => action({ items: args }); false = (arg) => action(arg).
+    CallbackShim.CallMethodWithCallbackAt = function (jsObject, funcName, callbackParamIndex, action, otherParams, isPackedParams) {
+        const handler = isPackedParams ? (...args) => action({ items: args }) : (arg) => action(arg);
+        return buildArgsAndApply(jsObject, funcName, handler, callbackParamIndex, otherParams);
+    };
+
+    CallbackShim.SetPropertyWithCallback = function (jsObject, propertyName, action, isPackedParams) {
+        const handler = isPackedParams ? (...args) => action({ items: args }) : (arg) => action(arg);
+        jsObject[propertyName] = handler;
+        return { __handler: handler };
+    };
+
+    // Wrap a .NET callback once; return the handler (SerratedJQ-style). Optional context is used for .bind(context) so handler has correct this.
+    // Use the same (...args) / (e) shapes as CallMethodWithCallbackAt — classic function()+arguments can break once .bind(context) is applied,
+    // and the managed Action<JSObject> may then receive the outer handler function instead of { items: [...] }.
+    CallbackShim.WrapCallback = function (action, isPackedParams, context) {
+        var handler = isPackedParams ? (...args) => action({ items: args }) : (e) => action(e);
+        if (context != null) {
+            handler = handler.bind(context);
+        }
+        return handler;
+    };
+
+    // CallbackHandle + packed params: same { items: args } shape as other packed shims so PackedParams uses one JSObject path.
+    CallbackShim.WrapPackedParamsCallback = function (onPacked, context) {
+        var handler = function () {
+            var args = Array.prototype.slice.call(arguments);
+            onPacked({ items: args });
+        };
+        if (context != null) {
+            handler = handler.bind(context);
+        }
+        return handler;
+    };
+
+    SerratedJSInteropShim.CallbackShim = CallbackShim;
 
 })(SerratedJSInteropShim = globalThis.SerratedJSInteropShim || (globalThis.SerratedJSInteropShim = {}));
 

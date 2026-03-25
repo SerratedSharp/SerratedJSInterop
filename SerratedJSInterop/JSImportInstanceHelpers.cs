@@ -17,7 +17,7 @@ internal static class JSImportInstanceHelpers
         | DynamicallyAccessedMemberTypes.NonPublicMethods
         | DynamicallyAccessedMemberTypes.Interfaces;
 
-    // J can be JSObject, primitive, or IJSObjectWrapper<J>
+    // J can be JSObject, primitive, object[] (JSType.Any / mixed arrays), string[]/double[]/JSObject[], or IJSObjectWrapper<J>
     public static J GetProperty<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string propertyName, bool applyJSCasing = true)
     {
         var name = applyJSCasing ? ToJSCasing(propertyName) : propertyName;
@@ -25,10 +25,22 @@ internal static class JSImportInstanceHelpers
         return CastOrWrap<J>(genericObject);
     }
 
-    public static void SetProperty(JSObject jsObject, string propertyName, object value, bool applyJSCasing = true)
+    /// <summary>
+    /// Sets a property on the JS object. When <paramref name="value"/> is an Action, Action&lt;JSObject&gt;, or Callback,
+    /// sets a wrapped handler and returns it for later removal; otherwise returns null.
+    /// </summary>
+    public static JSObject? SetProperty(JSObject jsObject, string propertyName, object value, bool applyJSCasing = true)
     {
         var name = applyJSCasing ? ToJSCasing(propertyName) : propertyName;
-        InstanceHelperJS.SetPropertyByName(jsObject, name, value);
+        if (value is Callback packedParams)
+            return CallbackShimProxy.SetPropertyWithCallback(jsObject, name, packedParams.ToShimAction(), isPackedParams: true);
+        if (value is Action<JSObject> act)
+            return CallbackShimProxy.SetPropertyWithCallback(jsObject, name, act, isPackedParams: false);
+        if (value is Action act0)
+            return CallbackShimProxy.SetPropertyWithCallback(jsObject, name, _ => act0(), isPackedParams: false);
+        var unwrappedValue = value as IJSObjectWrapper;
+        InstanceHelperJS.SetPropertyByName(jsObject, name, unwrappedValue?.JSObject ?? value);
+        return null;
     }
 
     // J should be a JSObject, IJSObjectWrapper<J>, or other primitive JS type
@@ -41,7 +53,20 @@ internal static class JSImportInstanceHelpers
     private static J CallJSFuncInternal<[DynamicallyAccessedMembers(WrapperTypeMembers)] J>(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
     {
         var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
-        object[] objs = UnwrapJSObjectParams(parameters);
+        var (callbackIndex, callback, isPackedParams) = TryGetCallbackAtIndex(parameters);
+        if (callbackIndex >= 0 && callback != null)
+        {
+            object[] objs = UnwrapJSObjectParams(parameters);
+            var otherParams = new object[objs.Length - 1];
+            for (int i = 0, j = 0; i < objs.Length; i++)
+            {
+                if (i != callbackIndex)
+                    otherParams[j++] = objs[i];
+            }
+            object? callbackResult = CallbackShimProxy.CallMethodWithCallbackAt(jsObject, name, callbackIndex, callback, otherParams, isPackedParams);
+            return CastOrWrap<J>(callbackResult);
+        }
+        object[] objsNormal = UnwrapJSObjectParams(parameters);
         object? genericObject = null;
         Type type = typeof(J);
 
@@ -50,13 +75,13 @@ internal static class JSImportInstanceHelpers
             switch (type.GetElementType())
             {
                 case Type t when t == typeof(string):
-                    genericObject = InstanceHelperJS.FuncByNameAsStringArray(jsObject, name, objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsStringArray(jsObject, name, objsNormal);
                     break;
                 case Type t when t == typeof(double):
-                    genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, name, objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsDoubleArray(jsObject, name, objsNormal);
                     break;
                 case Type t when t == typeof(JSObject):
-                    genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objs);
+                    genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objsNormal);
                     break;
                 default:
                     throw new NotImplementedException($"CallJSFunc: Returning array of {type.GetElementType()} not implemented");
@@ -64,7 +89,7 @@ internal static class JSImportInstanceHelpers
         }
         else
         {
-            genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objs);
+            genericObject = InstanceHelperJS.FuncByNameAsObject(jsObject, name, objsNormal);
         }
 
         return CastOrWrap<J>(genericObject);
@@ -79,8 +104,47 @@ internal static class JSImportInstanceHelpers
     private static void CallJSFuncVoidInternal(JSObject jsObject, string funcName, bool applyJSCasing, params object[] parameters)
     {
         var name = applyJSCasing ? ToJSCasing(funcName) : funcName;
-        object[] objs = UnwrapJSObjectParams(parameters);
-        InstanceHelperJS.FuncByNameVoid(jsObject, name, objs);
+        var (callbackIndex, callback, isPackedParams) = TryGetCallbackAtIndex(parameters);
+        if (callbackIndex >= 0 && callback != null)
+        {
+            // if has a callback param, bundle params with the callback first(to comply with JSImport signature)
+            // and an index indicating the true position of the callback param so it and otherParams can be reordered on the JS side
+            object[] objs = UnwrapJSObjectParams(parameters);
+            var otherParams = new object[objs.Length - 1];
+            for (int i = 0, j = 0; i < objs.Length; i++)
+            {
+                if (i != callbackIndex)
+                    otherParams[j++] = objs[i];
+            }
+            _ = CallbackShimProxy.CallMethodWithCallbackAt(jsObject, name, callbackIndex, callback, otherParams, isPackedParams);
+            return;
+        }
+        else // normal CallJS/invocation through FuncByNameVoid
+        {
+            object[] objsNormal = UnwrapJSObjectParams(parameters);
+            InstanceHelperJS.FuncByNameVoid(jsObject, name, objsNormal);
+        }
+    }
+
+    /// <summary>
+    /// Finds the first parameter that is an Action, Action&lt;JSObject&gt;, or Callback and returns its index, normalized Action&lt;JSObject&gt;, and isPackedParams.
+    /// Used to route CallJS to the callback-at-index shim when a delegate or Callback is passed as a normal object parameter.
+    /// </summary>
+    private static (int index, Action<JSObject>? callback, bool isPackedParams) TryGetCallbackAtIndex(object[] parameters)
+    {
+        if (parameters == null)
+            return (-1, null, false);
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            object param = parameters[i];
+            if (param is Callback packedParams)
+                return (i, packedParams.ToShimAction(), true);
+            if (param is Action<JSObject> act)
+                return (i, act, false);
+            if (param is Action act0)
+                return (i, _ => act0(), false);
+        }
+        return (-1, null, false);
     }
 
     // Casts the object to J, or if J is an IJSObjectWrapper, wraps the JSObject using the cached WrapInstance delegate.
@@ -99,12 +163,16 @@ internal static class JSImportInstanceHelpers
                 Type elementType = type.GetElementType()!;
                 if (genericObject is object[] objArray)
                 {
+                    // elementType is J's declared element type (e.g. string for string[]), not the runtime type of each slot;
+                    // typeof(string) != typeof(object), so only GetJSProperty<object[]> matches typeof(object).
                     if (elementType == typeof(string))
                         return (J)(object)Array.ConvertAll(objArray, o => o?.ToString() ?? "");
                     if (elementType == typeof(double))
                         return (J)(object)Array.ConvertAll(objArray, o => o is double d ? d : Convert.ToDouble(o));
                     if (elementType == typeof(JSObject))
                         return (J)(object)objArray.Cast<JSObject>().ToArray();
+                    if (elementType == typeof(object))
+                        return (J)(object)objArray; // mixed JSType.Any array; only matches J == object[]
                     throw new NotImplementedException($"CastOrWrap: Array of {elementType} not implemented");
                 }
                 return (J)genericObject!; // already string[] or double[] from typed interop
@@ -194,7 +262,6 @@ internal static class JSImportInstanceHelpers
         if (parameters == null)
             return Array.Empty<object>();
 
-        // New param array with unwrapped JSObjects if wrappers are found. Only create array if/when we encounter first wrapper.
         object[]? objs = null;
         for (int i = 0; i < parameters.Length; i++)
         {
@@ -203,7 +270,6 @@ internal static class JSImportInstanceHelpers
             {
                 if (objs == null)
                     objs = TypedArrayToObjectArray(parameters, i);
-
                 objs[i] = wrapper.JSObject;
             }
             else if (objs != null)
