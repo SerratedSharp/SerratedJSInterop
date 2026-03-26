@@ -50,6 +50,21 @@ public class Audio : IJSObjectWrapper<Audio>
     // Permits other methods to return this type such as GetJSProperty<Audio>() or CallJS<Audio>()
     static Audio IJSObjectWrapper<Audio>.WrapInstance(JSObject jsObject) => new Audio(jsObject);
 }
+
+public static void Main()
+{
+  var audio = new Audio();
+  // Declare callback handler
+  Action<JSObject> onVolumeChange = ev =>
+  {
+    JSObject target = ev.GetJSProperty<JSObject>("target");
+    double volume = target.GetJSProperty<double>("volume");
+    GlobalJS.Console.Log("volumechange:", volume);
+  };
+  // Subscribe to event, registering callback as listener
+  audio.JSObject.CallJS(funcName: "addEventListener", "volumechange", onVolumeChange);
+}
+
 ```
 
 Alternatively, adhoc interop without wrapper is possible on InteropServices JSObject:
@@ -327,9 +342,7 @@ Note JSObject references would not be preserved across such deserialization.  Th
 
 ### Callbacks
 
-Pass C# delegates (or a **CallbackHandle**) to JS as arguments to `CallJS` / `CallJS<T>()` or as the value in `SetJSProperty`. The library detects `Action`, `Action<JSObject>`, `Callback`, and `CallbackHandle` and invokes your delegate when JS calls back. The event argument is a `JSObject` you can read with interop (e.g. `GetJSProperty`).
-
-**Example: click handler that uses the event (e.g. PointerEvent)**
+To register callbacks in JS API's, pass C# delegates as parameters to `CallJS` / `CallJS<T>()` or as the value in `SetJSProperty`. The library detects `Action`, `Action<JSObject>`, `Callback`, and `CallbackHandle` and marshals them as callbacks. 
 
 ```csharp
 var doc = Document.GetDocument();
@@ -343,11 +356,10 @@ button.SetJSProperty(propertyName: "onclick", (Action<JSObject>)(e =>
     GlobalJS.Console.Log("click", type, clientX);
 }));
 
-button.CallJS(funcName: "click");   // programmatic click
-// Later: button.SetJSProperty(propertyName: "onclick", null!);  // clear
+button.CallJS(funcName: "click");   // force click event
 ```
 
-> Note: Action delegates must be explicitly declared with `Action` or `Action<parameType>` since we cannot infer the parameter types across the interop boundary. Implicitly typed lambdas are not supported.
+> Note: Action delegates must be explicitly declared with `Action` or `Action<parameType>` since we cannot infer the parameter types across the interop boundary.
 
 #### Callback With No Parameters (`Action`)
 
@@ -387,17 +399,46 @@ Action<JSObject> handler = e => {
 button.CallJS(funcName: "addEventListener", "click", handler);
 ```
 
-#### Single-Argument Callback (`Action<JSObject>`)
+#### Single-Parameter Callback
 
-Consider a JavaScript callback taking a single parameter:
+Consider a JavaScript callback receiving a single parameter:
 
 ```javascript
-button.addEventListener("click", function(event) {
-    console.log(event.type, event.clientX);
+target.progressNotification(function(percentComplete) {
+    if (percentComplete === 100)
+        console.log("progress: Complete");
+    else
+        console.log("progress:", percentComplete);
 });
 ```
 
-The equivalent C#/JS interop declares a `Action<JSObject>` handler:
+Use `Callback.Create<T>` to create a callback handler that receives a single strongly-typed parameter:
+
+```csharp
+target.CallJS(funcName: "progressNotification",
+    Callback.Create<int>(percentComplete =>
+    {
+        if (percentComplete == 100)
+            GlobalJS.Console.Log("progress: Complete");
+        else
+            GlobalJS.Console.Log("progress:", percentComplete);
+    })
+);
+```
+
+For complex type parameters, use `Callback.Create<JSObject>` with additional interop to retrieve details:
+
+```csharp
+button.CallJS(funcName: "addEventListener", "click",
+    Callback.Create<JSObject>(e =>
+    {
+        var type = e.GetJSProperty<string>("type");
+        var clientX = e.GetJSProperty<double>("clientX");
+        GlobalJS.Console.Log(type, clientX);
+    }));
+```
+
+The equivalent C#/JS interop can also declare an `Action<JSObject>` handler:
 
 ```csharp
 Action<JSObject> handler = e =>
@@ -409,6 +450,8 @@ Action<JSObject> handler = e =>
 
 button.CallJS(funcName: "addEventListener", "click", handler);
 ```
+
+> Note: For single-parameter `Action<T>` callbacks, only `Action<JSObject>` is supported.  Use Callback.Create<T> for other parameter types.
 
 #### Multiple Callback Parameters
 
