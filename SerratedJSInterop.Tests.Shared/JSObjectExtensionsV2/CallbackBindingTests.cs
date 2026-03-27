@@ -27,6 +27,18 @@ public partial class TestsContainer
     }
 
     /// <summary>
+    /// Test wrapper for DOM click events to validate Callback.Create&lt;T&gt; with IJSObjectWrapper&lt;T&gt; marshalling.
+    /// </summary>
+    private sealed class ClickEvent : IJSObjectWrapper<ClickEvent>
+    {
+        public JSObject JSObject { get; }
+        public ClickEvent(JSObject jsObject) => JSObject = jsObject;
+        public string Type => this.GetJSProperty<string>(propertyName: "type");
+        public double ClientX => this.GetJSProperty<double>(propertyName: "clientX");
+        public static ClickEvent WrapInstance(JSObject jsObject) => new ClickEvent(jsObject);
+    }
+
+    /// <summary>
     /// Returns the callback test mock object from JS (via CallbackTestMockShim.GetCallbackTestMock(); requires RCL script loaded).
     /// <para>
     /// The mock simulates a typical JS event subscription pattern (like addEventListener/removeEventListener).
@@ -150,6 +162,37 @@ public partial class TestsContainer
             div.CallJS(funcName: "click");
             Assert(count == 1, "Click handler should run once");
             Assert(true, "Handler operated on event parameter via GlobalJS.Console.Log without throw");
+        }
+    }
+
+    /// <summary>
+    /// Callback.Create&lt;T&gt; should auto-wrap a JS event object into an IJSObjectWrapper&lt;T&gt;.
+    /// Verifies a typed event wrapper can read multiple properties from the underlying event JSObject.
+    /// </summary>
+    public class CallbackBinding_Click_Handler_TypedEventWrapper : JSTest
+    {
+        public override void Run()
+        {
+            StubHtmlIntoTestContainer(0);
+            var doc = Document.GetDocument();
+            var div = doc.CreateElement("div").JSObject;
+
+            int count = 0;
+            string? eventType = null;
+            double eventClientX = -1;
+
+            div.SetJSProperty(propertyName: "onclick", Callback.Create<ClickEvent>(e =>
+            {
+                count++;
+                eventType = e.Type;
+                eventClientX = e.ClientX;
+            }));
+
+            div.CallJS(funcName: "click");
+
+            Assert(count == 1, "Typed callback should be invoked once");
+            Assert(eventType == "click", $"Expected wrapped event type 'click', got '{eventType}'");
+            Assert(eventClientX >= 0, $"Expected wrapped clientX to be available, got {eventClientX}");
         }
     }
 
@@ -336,7 +379,7 @@ public partial class TestsContainer
 
             Assert(handler != null, "Handler should be non-null");
 
-            // Fire with a number and a string ù both primitives that cannot be passed to Action<JSObject>
+            // Fire with a number and a string ÔøΩ both primitives that cannot be passed to Action<JSObject>
             targetJs.CallJS(funcName: "fire", 42, "hello");
 
             Assert(count == 1, "Packed-params callback should be invoked once");
@@ -367,7 +410,7 @@ public partial class TestsContainer
 
             Assert(handler != null, "Handler should be non-null");
 
-            // Fire with a number and a string ù both primitives that cannot be passed to Action<JSObject>
+            // Fire with a number and a string ÔøΩ both primitives that cannot be passed to Action<JSObject>
             targetJs.CallJS(funcName: "fire", 42, "hello");
 
             Assert(count == 1, "Packed-params callback should be invoked once");
@@ -461,6 +504,51 @@ public partial class TestsContainer
                 "Third packed arg should be the same JSObject instance as the stubbed test div");
             Assert(receivedObj!.GetJSProperty<string>("className") == "a",
                 $"Stubbed div className should be 'a', got '{receivedObj.GetJSProperty<string>("className")}'");
+        }
+    }
+
+    /// <summary>
+    /// Typed <see cref="Callback.Create{T1, T2, T3, T4, T5}"/> overload with mixed primitive and JSObject parameters.
+    /// Verifies argument count, numeric coercion, and JSObject identity across five callback arguments.
+    /// </summary>
+    public class CallbackBinding_TypedPackedParams_FiveArguments_MixedTypes : JSTest
+    {
+        public override void Run()
+        {
+            JQueryPlainObject stubs = StubHtmlIntoTestContainer(1);
+            JSObject stubDivJs = stubs.Get(0);
+            var targetJs = EnsureCallbackTestMock();
+
+            int count = 0;
+            int receivedInt = 0;
+            string? receivedString = null;
+            JSObject? receivedObj = null;
+            double receivedDouble = 0;
+            bool receivedBool = false;
+
+            var handler = targetJs.CallJS<JSObject>(funcName: "add",
+                Callback.Create<int, string, JSObject, double, bool>((i, s, o, d, b) =>
+                {
+                    count++;
+                    receivedInt = i;
+                    receivedString = s;
+                    receivedObj = o;
+                    receivedDouble = d;
+                    receivedBool = b;
+                }));
+
+            Assert(handler != null, "Handler should be non-null");
+
+            targetJs.CallJS(funcName: "fire", 42, "hello", stubDivJs, 12.5, true);
+
+            Assert(count == 1, "Typed 5-arg callback should be invoked once");
+            Assert(receivedInt == 42, $"Should receive int 42, got {receivedInt}");
+            Assert(receivedString == "hello", $"Should receive string 'hello', got '{receivedString}'");
+            Assert(receivedObj != null, "Third argument should marshal as JSObject");
+            Assert(ReferenceEquals(receivedObj, stubDivJs),
+                "Third packed arg should be the same JSObject instance as the stubbed test div");
+            Assert(Math.Abs(receivedDouble - 12.5) < 0.01, $"Should receive double 12.5, got {receivedDouble}");
+            Assert(receivedBool, "Should receive bool true");
         }
     }
 

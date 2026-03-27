@@ -82,6 +82,20 @@ public readonly struct Callback
             JSImportInstanceHelpers.CastOrWrap<T4>(items[3]));
     });
 
+    /// <summary>Creates a typed packed-params callback. The five JS callback arguments are coerced to <typeparamref name="T1"/>, <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="T4"/>, and <typeparamref name="T5"/>.</summary>
+    public static Callback Create<[DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] T1, [DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] T2, [DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] T3, [DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] T4, [DynamicallyAccessedMembers(JSImportInstanceHelpers.WrapperTypeMembers)] T5>(
+        Action<T1, T2, T3, T4, T5> action) => new Callback(packed =>
+    {
+        var items = packed.GetUnpacked();
+        if (items.Length < 5) throw new ArgumentException($"Expected at least 5 callback arguments, got {items.Length}");
+        action(
+            JSImportInstanceHelpers.CastOrWrap<T1>(items[0]),
+            JSImportInstanceHelpers.CastOrWrap<T2>(items[1]),
+            JSImportInstanceHelpers.CastOrWrap<T3>(items[2]),
+            JSImportInstanceHelpers.CastOrWrap<T4>(items[3]),
+            JSImportInstanceHelpers.CastOrWrap<T5>(items[4]));
+    });
+
     /// <summary>Returns the shim action (JSObject => invoke user action with new PackedParams(jsObject)). Used internally.</summary>
     internal Action<JSObject> ToShimAction()
     {
