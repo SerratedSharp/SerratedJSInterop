@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace SerratedSharp.SerratedJSInterop;
 
@@ -25,10 +26,7 @@ public static class WrapperPropertyExtensions
     /// <param name="propertyName">Name of the property on this wrapper's <c>JSObject</c> to set, with first letter lower cased for JS casing conventions.</param>
     [OverloadResolutionPriority(10)]
     public static void SetJSProperty(this IJSObjectWrapper wrapper, object value, [CallerMemberName] string? propertyName = null)
-    {
-        var unwrappedValue = value as IJSObjectWrapper;
-        JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName!, unwrappedValue?.JSObject ?? value);
-    }
+        => _ = JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName!, value);
 
     /// <summary>
     /// <para>Set the value of <c>propertyName</c> on this IJSObjectWrapper's JSObject.</para>
@@ -36,12 +34,9 @@ public static class WrapperPropertyExtensions
     /// </summary>
     /// <param name="wrapper">The wrapper whose JSObject to set the property on.</param>
     /// <param name="propertyName">Name of the property on this wrapper's <c>JSObject</c> to set, with casing preserved.</param>
-    /// <param name="value">Value to set. IJSObjectWrapper instances are unwrapped to their JSObject.</param>
+    /// <param name="value">Value to set. Delegates and Callback are wrapped; IJSObjectWrapper is unwrapped to JSObject.</param>
     public static void SetJSProperty(this IJSObjectWrapper wrapper, string propertyName, object value)
-    {
-        var unwrappedValue = value as IJSObjectWrapper;
-        JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName, unwrappedValue?.JSObject ?? value, applyJSCasing: false);
-    }
+        => _ = JSImportInstanceHelpers.SetProperty(wrapper.JSObject, propertyName, value, applyJSCasing: false);
 }
 
 

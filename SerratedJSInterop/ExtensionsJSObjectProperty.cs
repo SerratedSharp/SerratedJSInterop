@@ -28,11 +28,7 @@ public static class ExtensionsJSObjectProperty
     /// <param name="propertyName">Name of the property on this <c>jsObject</c> to set.  Omit to infer from [CallerMemberName], with first letter lower cased for JS casing conventions.</param>
     [OverloadResolutionPriority(10)]
     public static void SetJSProperty(this JSObject jsObject, object value, [CallerMemberName] string? propertyName = null)
-    {
-        var unwrappedValue = value as IJSObjectWrapper;
-        JSImportInstanceHelpers.SetProperty(jsObject, propertyName!, unwrappedValue?.JSObject ?? value);
-    }
-
+        => _ = JSImportInstanceHelpers.SetProperty(jsObject, propertyName!, value);
 
     /// <summary>
     /// <para>Set the value of <c>propertyName</c> on this JSObject with an explicit propertyName.</para>
@@ -40,13 +36,9 @@ public static class ExtensionsJSObjectProperty
     /// </summary>
     /// <param name="jsObject">Reference to the JS instance to set the property on.</param>
     /// <param name="propertyName">Name of the property on this <c>jsObject</c> to set, with casing preserved.</param>
-    /// <param name="value">Value to set.</param>
+    /// <param name="value">Value to set. Delegates and Callback are wrapped; IJSObjectWrapper is unwrapped to JSObject.</param>
     public static void SetJSProperty(this JSObject jsObject, string propertyName, object value)
-    {
-        var unwrappedValue = value as IJSObjectWrapper;
-        JSImportInstanceHelpers.SetProperty(jsObject, propertyName, unwrappedValue?.JSObject ?? value, applyJSCasing: false);
-    }
-
+        => _ = JSImportInstanceHelpers.SetProperty(jsObject, propertyName, value, applyJSCasing: false);
 }
 
 

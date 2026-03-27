@@ -46,10 +46,25 @@ public class Audio : IJSObjectWrapper<Audio>
     // Map return to a native JSObject instead of requesting a wrapped type
     public JSObject CaptureStream() => this.CallJS<JSObject>();
         
-    // IJSObjectWrapper<Audio> utility method that allows library to auto-wrap JSObject's as requested.
+    // IJSObjectWrapper<Audio> utility method that allows library to auto-wrap JSObject references as requested.
     // Permits other methods to return this type such as GetJSProperty<Audio>() or CallJS<Audio>()
     static Audio IJSObjectWrapper<Audio>.WrapInstance(JSObject jsObject) => new Audio(jsObject);
 }
+
+public static void Main()
+{
+  var audio = new Audio();
+  // Declare callback handler
+  Action<JSObject> onVolumeChange = ev =>
+  {
+    JSObject target = ev.GetJSProperty<JSObject>("target");
+    double volume = target.GetJSProperty<double>("volume");
+    GlobalJS.Console.Log("volumechange:", volume);
+  };
+  // Subscribe to event, registering callback as listener
+  audio.JSObject.CallJS(funcName: "addEventListener", "volumechange", onVolumeChange);
+}
+
 ```
 
 Alternatively, adhoc interop without wrapper is possible on InteropServices JSObject:
@@ -74,14 +89,12 @@ bool hasClass = classesList.Contains("my-class"); // custom wrapper method
 ## Prerequisites
 
 - .NET 9 or later (or the target framework supported by the platform package you use).
-
 - A project that compiles to WebAssembly: 
   - A WebAssembly Browser App project created according to [JavaScript `[JSImport]`/`[JSExport]` interop with a WebAssembly Browser App project](https://learn.microsoft.com/en-us/aspnet/core/client-side/dotnet-interop/wasm-browser-app?view=aspnetcore-8.0).
   - A Blazor client-side project created according to [JavaScript JSImport/JSExport interop with ASP.NET Core Blazor](https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/import-export-interop?view=aspnetcore-8.0).
     - Note: `System.Runtime.InteropServices.JavaScript` is used for SerratedJSInterop.  This differs from the typical Blazor IJSRuntime, but can operate side-by-side within Blazor WASM.
   - A WASM framework/platform that supports [JSImport]/[JSExport] interop (System.Runtime.InteropServices.JavaScript), such as Uno Platform WASM.  
     - (Note: As of the newest migration, validation of compatibility with Uno has not been completed.  Anyone willing to do so please see: [Issue #33](https://github.com/SerratedSharp/SerratedJSInterop/issues/33))
-
 
 ## Quick Start
 
@@ -91,8 +104,8 @@ You typically reference a **platform-specific package** through NuGet that depen
 - **SerratedSharp.SerratedJSInterop.WasmBrowser** — .NET WebAssembly Browser Apps (i.e. wasm-experimental workload).
 - **SerratedSharp.SerratedJSInterop.Uno** — Uno Platform projects targeting WebAssembly.
 
-1) Add a reference to one of the above platform-specific packages via NuGet.
-2) Add the following call to Program.Main() to load the JS module:
+1. Add a reference to one of the above platform-specific packages via NuGet.
+2. Add the following call to Program.Main() to load the JS module:
 
 ```csharp
 await SerratedJSInteropModule.ImportAsync();
@@ -105,6 +118,7 @@ await SerratedJSInteropModule.ImportAsync("/myapp");
 ```
 
 In some cases the context of the WASM runtime loader is initialized from a subpath of the site, and would require the following:
+
 ```csharp
 await SerratedJSInteropModule.ImportAsync("..");
 ```
@@ -120,10 +134,11 @@ There are two main ways to use SerratedJSInterop: wrapping a JS type with C# cla
 
 ### Instance Wrapper
 
-- Implement `IJSObjectWrapper<YourType>` and expose a `JSObject`. 
+- Implement `IJSObjectWrapper<YourType>` and expose a `JSObject` property. 
 - Implement the required static WrapInstance method, which is leveraged by the library to automatically wrap returned instances for calls such as `CallJS<YourType>()`.
-- Use `SerratedJS.New("JsTypeName")` for parameterless construction, or `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments. 
+- Use `SerratedJS.New("JsTypeName")` for parameterless construction, `SerratedJS.New("JsTypeName", "param1", 2, someJSobject3)` with variable arguments, or omit the constructor if this type is typically not constructed directly but retrieved via other methods(HTMLElement for example). 
 - Use `this.GetJSProperty<T>()`, `this.SetJSProperty(value)`, `this.CallJS<T>(...)`, and `this.CallJS(...)` to map properties/methods to the underlying JSObject reference.
+- **CONSIDER:** Implementing a constructor taking a JSObject as shown below, ensuring a caller can wrap a JSObject reference obtained through other means.
 
 ```csharp
 public class Image : IJSObjectWrapper<Image>
@@ -151,7 +166,7 @@ public class Image : IJSObjectWrapper<Image>
 }
 ```
 
-Use `this.CallJS<T>(funcName:"someJSMethodName",...)`, `GetJSProperty<string>("someJSName")`, and `SetJSProperty(propertyName: "someJSName", someValue)` to specify JS member names explicitly.  Useful where you want to wrap a member with a conventional .NET name, or where you need to specify an explicit casing in lieu of the automatic *lowerCamelCase* adjustment:
+Use `CallJS<T>(funcName:"someJSMethodName",...)`, `GetJSProperty<string>("someJSName")`, and `SetJSProperty(propertyName: "someJSName", someValue)` to specify JS member names explicitly.  Useful where you want to wrap a member with a conventional .NET name, or where you need to specify an explicit casing in lieu of the automatic *lowerCamelCase* adjustment:
 
 ```csharp
 public string Source { 
@@ -222,6 +237,7 @@ public void SetAttribute(string name, string value)
 IJSObjectWrapper is not required. Extension methods are also defined on `System.Runtime.InteropServices.JavaScript.JSObject`. 
 
 These can be used for adhoc interop (use `funcName:` when specifying the JS function name explicitly):
+
 ```csharp
 var doc = Document.GetDocument();
 var spanJSObject = doc.JSObject.CallJS<JSObject>(funcName: "createElement", "span");
@@ -280,7 +296,7 @@ public HtmlElement InsertBefore(HtmlElement newChild, HtmlElement? referenceChil
         SerratedJS.Params(newChild.JSObject, referenceChild?.JSObject, "3", 4, 5.0f));
 ```
 
-When function names are specified explicitly, use the **`funcName:`** named parameter and SerratedJS.Params can be optionally omitted.  The `funcName:` param must be named explicitly to ensure the appropriate overload is selected:
+When function names are specified explicitly, use the `funcName:` named parameter and SerratedJS.Params can be optionally omitted.  The `funcName:` param must be named explicitly to ensure the appropriate overload is selected:
 
 ```csharp
 var el = doc.CallJS<HtmlElement?>(funcName: "querySelector", ".container");
@@ -324,6 +340,200 @@ This does not require an extra roundtrip. The payload is serialized in .NET and 
 
 Note JSObject references would not be preserved across such deserialization.  This approach is only appropriate for data-only objects where the properties are primitives or simple serializable types.  For objects with JSObject references, it's recommended to define a wrapper type and use the standard interop patterns.
 
+### Callbacks
+
+To register callbacks in JS API's, pass C# delegates as parameters to `CallJS` / `CallJS<T>()` or as the value in `SetJSProperty`. The library detects `Action`, `Action<JSObject>`, `Callback`, and `CallbackHandle` and marshals them as callbacks. 
+
+```csharp
+var doc = Document.GetDocument();
+var button = doc.CreateElement("button").JSObject;
+
+button.SetJSProperty(propertyName: "onclick", (Action<JSObject>)(e =>
+{
+    // e is the event (e.g. PointerEvent); read properties via interop
+    var clientX = e.GetJSProperty<double>("clientX");
+    var type = e.GetJSProperty<string>("type");
+    GlobalJS.Console.Log("click", type, clientX);
+}));
+
+button.CallJS(funcName: "click");   // force click event
+```
+
+> Note: Action delegates must be explicitly declared with `Action` or `Action<parameType>` since we cannot infer the parameter types across the interop boundary.
+
+#### Callback With No Parameters (`Action`)
+
+Consider this JavaScript assigning a callback handler via a property:
+
+```javascript
+button.onclick = function() { console.log("clicked"); };
+```
+
+The equivalent C#/JS interop declares a C# Action with no parameters as the handler for the callback, and passes it as a parameter via SetJSProperty:
+
+```csharp
+button.SetJSProperty(propertyName: "onclick", 
+  (Action)(() => {
+    GlobalJS.Console.Log("clicked");
+  })
+);
+```
+
+If the callback handler is added via a JS method call,
+
+```javascript
+button.addEventListener("click", 
+  function() { 
+    console.log("clicked"); 
+  }
+);
+```
+
+... then use CallJS, passing the callback handler to the corresponding positional parameter.  This also demonstrates an alternative syntax where the handler is declared seperately before being passed to the subscription call:
+
+```csharp
+Action<JSObject> handler = e => {
+  GlobalJS.Console.Log("clicked");
+};
+
+button.CallJS(funcName: "addEventListener", "click", handler);
+```
+
+#### Single-Parameter Callback
+
+Consider a JavaScript callback receiving a single parameter:
+
+```javascript
+target.progressNotification(function(percentComplete) {
+    if (percentComplete === 100)
+        console.log("progress: Complete");
+    else
+        console.log("progress:", percentComplete);
+});
+```
+
+Use `Callback.Create<T>` to create a callback handler that receives a single parameter.  Types used for `T` must be supported by [.NET InteropServices Type Mapping](https://learn.microsoft.com/en-us/aspnet/core/client-side/dotnet-interop/?view=aspnetcore-9.0#type-mappings):
+
+```csharp
+target.CallJS(funcName: "progressNotification",
+    Callback.Create<int>(percentComplete =>
+    {
+        if (percentComplete == 100)
+            GlobalJS.Console.Log("progress: Complete");
+        else
+            GlobalJS.Console.Log("progress:", percentComplete);
+    })
+);
+```
+
+For complex parameters `Callback.Create<JSObject>` can be used with additional interop to retrieve details:
+
+```csharp
+button.CallJS(funcName: "addEventListener", "click",
+    Callback.Create<JSObject>(e =>
+    {
+        var type = e.GetJSProperty<string>("type");
+        var clientX = e.GetJSProperty<double>("clientX");
+        GlobalJS.Console.Log(type, clientX);
+    }));
+```
+
+Wrappers implementing `IJSObjectWrapper<T>` can be used, and the JSObject will be wrapped in the requested type, allowing for more natural strongly-typed access to callback parameters:
+
+```csharp
+public sealed class ClickEvent : IJSObjectWrapper<ClickEvent>
+{
+    public JSObject JSObject { get; }
+    public ClickEvent(JSObject jsObject) => JSObject = jsObject;
+    public string Type => this.GetJSProperty<string>();
+    public double ClientX => this.GetJSProperty<double>();
+    public static ClickEvent WrapInstance(JSObject jsObject) => new ClickEvent(jsObject);
+}
+
+button.CallJS(funcName: "addEventListener", "click",
+    Callback.Create<ClickEvent>(ev =>
+    {
+        GlobalJS.Console.Log(ev.Type, ev.ClientX);
+    })
+);
+```
+
+#### Multiple Callback Parameters
+
+For callbacks with multiple parameters, use
+`Callback.Create<T1, T2, ...>` (up to 4 type parameters).
+
+The library coerces each parameter to the requested type (for example JS `number` to C# `int`):
+
+```csharp
+emitter.SetJSProperty(propertyName: "ondata",
+    Callback.Create<JSObject, int, string>((sender, statusCode, context) =>
+    {
+        GlobalJS.Console.Log(sender, statusCode, context);
+    }));
+```
+
+If you need full control or more than 4 arguments, use the low-level `PackedParams` path via `Callback.CreatePacked(Action<PackedParams>)`:
+
+```csharp
+emitter.SetJSProperty(propertyName: "ondata", Callback.CreatePacked(packed =>
+{
+    object[] args = packed.GetUnpacked();
+    int statusCode = Convert.ToInt32(args[1]);
+    GlobalJS.Console.Log(args[0], statusCode, args[2]);
+}));
+```
+
+#### Callback Handle (`CallbackHandle`)
+
+Wrap a delegate once with `Callback.MarshalAsHandle(...)` and reuse the same handle for add/remove without re-wrapping. Optional **context** (`JSObject`) applies `.bind(context)` on the JS side.
+
+To implement interop equivalent to the following JavaScript registering and later unregistering the same function reference:
+
+```javascript
+function handler(e) { console.log(e.type); }
+element.addEventListener("click", handler);
+// ...later:
+element.removeEventListener("click", handler);
+```
+
+... create a `CallbackHandle` once, then pass it to CallJS for both add and remove:
+
+```csharp
+CallbackHandle handle = Callback.MarshalAsHandle(
+    (Action<JSObject>)(e => GlobalJS.Console.Log(e.GetJSProperty<string>("type"))));
+element.CallJS(funcName: "addEventListener", "click", handle);
+// ...later:
+element.CallJS(funcName: "removeEventListener", "click", handle);
+```
+
+All three delegate types have `MarshalAsHandle` overloads:
+
+```csharp
+CallbackHandle h1 = Callback.MarshalAsHandle(() => count++);                    // Action
+CallbackHandle h2 = Callback.MarshalAsHandle((Action<JSObject>)(_ => count++)); // Action<JSObject>
+CallbackHandle h3 = Callback.MarshalAsHandle(                                   // Callback (typed)
+    Callback.Create<int, string>((id, name) => { }));
+CallbackHandle h4 = Callback.MarshalAsHandle(                                   // Callback (untyped)
+    Callback.CreatePacked(packed => { var args = packed.GetUnpacked(); }));
+CallbackHandle h5 = Callback.MarshalAsHandle(                                   // with context
+    (Action<JSObject>)(e => { }), context: someJSObject);
+```
+
+When you register a callback via a **method** (e.g. `add(callback)`), the call can return a **handler** (`JSObject`) to pass to the corresponding remove method. When you set a **property** (e.g. `onclick`), set it to `null` to clear.
+
+```csharp
+// add/remove style: delegate or handle
+JSObject handler = target.CallJS<JSObject>(funcName: "add", (Action<JSObject>)(_ => count++));
+target.CallJS(funcName: "fire", target.JSObject);
+target.CallJS(funcName: "remove", handler);
+
+// Or with a handle (same handle used for remove)
+CallbackHandle handle = Callback.MarshalAsHandle((Action<JSObject>)(_ => count++));
+target.CallJS(funcName: "add", handle);
+target.CallJS(funcName: "remove", handle);
+```
+
 ### Singleton
 
 There are different approaches to implementing singletons or static interop wrappers, depending on the preference of the implementor.  The below demonstrates a combination of approaches.  The type could either be accessed statically via `Document.GetDocument()` or registered with DI of choice to be injected as/where needed.  
@@ -364,7 +574,7 @@ public static class GlobalJS
 
 - **SerratedDom** — DOM/HTML wrappers (Document, HtmlElement, Image, DomTokenList, Location) that use SerratedJSInterop. See the [SerratedDom](SerratedDom/) folder and [SerratedDom/readme.md](SerratedDom/readme.md). Types like `Document` and `HtmlElement` implement `IJSObjectWrapper`; `DomTokenList` and `Location` use a private `JSObject` with **JSObjectExtensionsV2** only.
 - **SerratedJQ** — TODO: Link once migrated to new library.
-- **Unit tests** — The [SerratedJSInterop.Tests.Shared](SerratedJSInterop.Tests.Shared/) project contains tests that exercise the extensions (e.g. `JSObjectExtensionsV2/DocumentTests.cs`, `HtmlElementTests.cs`, `DomTokenListTests.cs`, `LocationTests.cs`). Some tests use internal or test-only setup; treat them as usage examples rather than a stable public API. 
+- **Unit tests** — The [SerratedJSInterop.Tests.Shared](SerratedJSInterop.Tests.Shared/) project contains tests that exercise the extensions (e.g. `JSObjectExtensionsV2/DocumentTests.cs`, `HtmlElementTests.cs`, `DomTokenListTests.cs`, `LocationTests.cs`). Some tests use internal or test-only setup; treat them as usage examples rather than a stable public API.
 
 ## Security Considerations
 
@@ -374,7 +584,21 @@ This ensures no potential for XSS to occur where a user supplied string could in
 
 ## Release Notes
 
-_(Release notes will be added here when the library is published to NuGet.)_
-
-
 This project is a migration of SerratedSharp.JSInteropHelpers previously used internally for other projects, with SerratedJSInterop formalized for broader use.
+
+## 0.3.4
+
+Adds support for passing callback handlers to CallJS and SetJSProperty.
+
+## 0.3.3
+
+Initial formalized release of SerratedJSInterop, migrated from JSInteropHelpers.  This release includes support for Blazor WASM and WASM Browser workloads.
+Includes support for the following JS interop:
+
+- New constructor via `SerratedJS.New()`
+- Property getters/setters via `GetJSProperty<T>()` and `SetJSProperty()`
+- Method calls via `CallJS<T>()` and `CallJS()`
+- Optional automatic wrapping of returned JSObject references to custom C# wrapper types implementing `IJSObjectWrapper<T>` via the static `WrapInstance()` method.
+- Support for inferred JS member names via `[CallerMemberName]` and explicit JS member names via `funcName:` and `propertyName:` parameters.
+- Support for passing parameters as primitives, JSObject, and IJSObjectWrapper with various overloads to support up to 5 parameters with inferred names and unlimited parameters with explicit names.
+- Support for passing data-only objects via JSON serialization with `MarshalAsJson()`.
